@@ -1,0 +1,13 @@
+{
+  "name": "baristina-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Outils de préparation : catalogue (seed.sql) et index de reconnaissance d'images.",
+  "scripts": {
+    "seed": "node build-seed.mjs",
+    "index": "node build-scan-index.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.7.0"
+  }
+}

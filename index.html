@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#173a23">
+  <meta name="description" content="Baristina — scanner, catalogue et collection de capsules de café compatibles Nespresso Original.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' data: blob: https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co; media-src 'self' blob:; base-uri 'self'; form-action 'self'">
+  <title>Baristina</title>
+  <link rel="icon" type="image/png" href="apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body class="on-home">
+<main class="app">
+
+  <section id="screen-home" class="screen active">
+    <div class="home-visual"><img src="home-reference-clean.jpg" alt="Baristina — tasse et dosettes de café"></div>
+    <div class="home-actions">
+      <a class="action red" href="#/scanner"><span class="ico" aria-hidden="true">◎</span><span class="txt">Scanner une capsule</span><span class="arr">›</span></a>
+      <a class="action terracotta" href="#/collection"><span class="ico" aria-hidden="true">♡</span><span class="txt">Ma collection</span><span class="arr">›</span></a>
+      <a class="action green" href="#/catalogue"><span class="ico" aria-hidden="true">☰</span><span class="txt">Catalogue</span><span class="arr">›</span></a>
+      <a class="action sage" href="#/compte"><span class="ico" aria-hidden="true">☺</span><span class="txt" id="home-account-label">Mon compte</span><span class="arr">›</span></a>
+      <p class="disclaimer">Baristina est une application indépendante, non affiliée à Nestlé Nespresso SA ni aux autres marques citées. Les noms de produits sont des marques de leurs propriétaires respectifs.</p>
+    </div>
+  </section>
+
+  <section id="screen-catalog" class="screen">
+    <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Catalogue</h2><button class="icon-btn" data-action="toggle-filters" aria-label="Filtres">⚙</button></header>
+    <div class="content">
+      <input id="q" class="search" type="search" placeholder="Rechercher une capsule, une marque, un arôme…" autocomplete="off">
+      <div id="brand-chips" class="chips"></div>
+      <div id="filters-panel" class="filters-panel" hidden>
+        <div class="row2">
+          <div><label class="lbl" for="f-range">Gamme</label><select id="f-range" class="field"></select></div>
+          <div><label class="lbl" for="f-sort">Trier par</label><select id="f-sort" class="field">
+            <option value="name">Nom</option><option value="intensity-desc">Intensité ↓</option><option value="intensity-asc">Intensité ↑</option></select></div>
+          <div><label class="lbl" for="f-min">Intensité min.</label><select id="f-min" class="field"></select></div>
+          <div><label class="lbl" for="f-max">Intensité max.</label><select id="f-max" class="field"></select></div>
+        </div>
+        <div class="toggles">
+          <button class="chip" data-toggle="decaf">Décaféiné</button>
+          <button class="chip" data-toggle="flavoured">Aromatisé</button>
+          <button class="chip" data-toggle="organic">Bio</button>
+          <button class="chip" data-toggle="limited">Édition limitée</button>
+          <button class="chip" data-toggle="owned">Dans ma collection</button>
+        </div>
+        <button class="link-btn" data-action="reset-filters">Réinitialiser les filtres</button>
+      </div>
+      <p id="result-count" class="result-count"></p>
+      <div id="catalog-list"><div class="loading">Chargement du catalogue…</div></div>
+    </div>
+  </section>
+
+  <section id="screen-detail" class="screen">
+    <header class="topbar"><button class="icon-btn" data-action="back" aria-label="Retour">‹</button><h2>Fiche capsule</h2><span class="icon-btn spacer"></span></header>
+    <div id="detail-content"></div>
+  </section>
+
+  <section id="screen-scan" class="screen">
+    <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Scanner une capsule</h2><span class="icon-btn spacer"></span></header>
+    <div class="content">
+      <div class="scanner">
+        <video id="video" autoplay playsinline muted></video>
+        <img id="photo-preview" alt="Photo prise" hidden>
+        <div class="frame" id="scan-frame"></div>
+      </div>
+      <div class="scan-controls">
+        <label class="round-btn file-btn" title="Choisir une photo dans la galerie">🖼<input id="scan-file" type="file" accept="image/*" hidden></label>
+        <button class="shutter" data-action="capture" aria-label="Prendre la photo"></button>
+        <button class="round-btn" data-action="retake" aria-label="Reprendre une photo">↺</button>
+      </div>
+      <div id="scan-status" class="status">Place la capsule dans le cadre, nom visible, sans flash.</div>
+      <div id="scan-results"></div>
+      <label class="lbl" for="scan-manual">Ou cherche-la par son nom</label>
+      <input id="scan-manual" class="search" type="search" placeholder="Ex. : Arpeggio, Or Absolu…" autocomplete="off">
+      <div id="scan-manual-results"></div>
+    </div>
+  </section>
+
+  <section id="screen-collection" class="screen">
+    <div class="collection-hero"><img src="collection-header-privee.jpg" alt="Ma collection"></div>
+    <div class="content" id="collection-content"></div>
+  </section>
+
+  <section id="screen-account" class="screen">
+    <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Mon compte</h2><span class="icon-btn spacer"></span></header>
+    <div class="content" id="account-content"></div>
+  </section>
+
+  <nav class="nav" aria-label="Navigation principale">
+    <a href="#/" data-nav="home"><svg viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.8l8.5 6.7v9.2a1 1 0 0 1-1 1h-5.2v-6.2H9.7v6.2H4.5a1 1 0 0 1-1-1z"/></svg>Accueil</a>
+    <a href="#/scanner" data-nav="scan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Scanner</a>
+    <a href="#/catalogue" data-nav="catalog"><svg viewBox="0 0 24 24"><path d="M3 5.5c3.2-.9 6.2-.3 9 1.8v12.7c-2.8-2.1-5.8-2.7-9-1.8z"/><path d="M21 5.5c-3.2-.9-6.2-.3-9 1.8v12.7c2.8-2.1 5.8-2.7 9-1.8z"/></svg>Catalogue</a>
+    <a href="#/collection" data-nav="collection"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Collection</a>
+    <a href="#/compte" data-nav="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Compte</a>
+  </nav>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</main>
+</body>
+</html>
