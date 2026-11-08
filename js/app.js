@@ -63,7 +63,9 @@ function artHTML(p, big) {
 }
 function capsuleHTML(p, big = false) {
   if (!p.photo_url) return artHTML(p, big);
-  return `<span class="capsule${big ? ' big' : ''}"><img src="${esc(p.photo_url)}" alt="${esc(p.name)}" loading="lazy" data-fallback="${esc(p.id)}"></span>`;
+  // Photo locale, ou photo officielle affichée depuis le site de la marque (pas de copie).
+  const external = /^https?:/.test(p.photo_url);
+  return `<span class="capsule${big ? ' big' : ''}"><img src="${esc(p.photo_url)}" alt="${esc(p.name)}" loading="lazy" data-fallback="${esc(p.id)}"${external ? ' referrerpolicy="no-referrer"' : ''}></span>${big && external ? `<p class="photo-credit">Photo : ${esc(brandName(p))}</p>` : ''}`;
 }
 // Photo introuvable : on affiche l'illustration à la place (les gestionnaires inline sont bloqués par la CSP).
 document.addEventListener('error', (e) => {

@@ -61,8 +61,14 @@ Un scan prend 1 à 3 secondes. L'app propose les 3 capsules les plus probables :
 cd scripts && npm install && npm run seed && npm run index
 ```
 
-Plus il y a de photos de référence (les tiennes ou celles validées de la communauté, à placer dans `photos/` et
-dans `photo_url`), meilleure est la reconnaissance.
+Références utilisées : tes photos (`photos/`) et les **photos officielles des marques**, dont la liste est dans
+`data/official-images.json` (générée par `node scripts/find-official-images.mjs`). Les photos officielles sont
+affichées dans le catalogue directement depuis le site de la marque (pas de copie) ; pour l'IA, elles sont
+téléchargées dans `scripts/.cache` (non publié) et seules leurs empreintes vont dans `data/scan-index.json`.
+Si une marque change ou bloque une image, l'app affiche l'illustration dessinée à la place.
+
+Fiabilité : la reconnaissance distingue bien les marques et les couleurs ; entre deux boîtes presque identiques
+d'une même marque, c'est la lecture du nom qui tranche — d'où l'intérêt de photographier le côté où le nom est écrit.
 
 ## 4. Mettre le site en ligne (GitHub Pages)
 

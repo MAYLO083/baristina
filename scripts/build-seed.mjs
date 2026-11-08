@@ -6,7 +6,7 @@
 //  - aucune phrase marketing recopiée : seuls des mots-clés d'arômes sont gardés,
 //    les descriptions affichées dans l'app sont rédigées à partir de ces faits ;
 //  - une information non confirmée reste vide (null / []).
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 
 const VERIFIED = '2026-11-08';
 
@@ -50,8 +50,6 @@ const nespresso = [
   ['indonesia', 'Indonesia', "Cafés d'origine", 8, [E, L], [], { color: '#2b5f6c', photo: 'indonesia', url: 'indonesia-capsule-cafe', origin: 'Sumatra, Indonésie (Arabica)', highlight: 'Labellisé Fairtrade' }],
   ['india', 'India', "Cafés d'origine", 11, [E, L], ['épicé'], { color: '#70855a', photo: 'india', url: 'india-capsule-cafe', origin: 'Inde' }],
   ['kahawa-ya-congo-organic', 'Kahawa ya Congo Organic', "Cafés d'origine", 7, [E, L], ['fruits', 'céréales'], { color: '#1a1a1a', photo: 'kahawa-ya-congo-organic-original', url: 'kahawa-ya-congo-organic-capsule-cafe', origin: 'Est du Congo', organic: true }],
-  ['peru-organic', 'Peru Organic', "Cafés d'origine", null, [], [], { color: '#8abb48', photo: 'peru-organic-original', url: 'original-peru-organic', origin: 'Pérou', organic: true }],
-  ['indonesia-organic', 'Indonesia Organic', "Cafés d'origine", null, [], [], { url: 'indonesia-organic-capsule-cafe', origin: 'Indonésie', organic: true }],
   ['arpeggio-decaffeinato', 'Arpeggio Decaffeinato', 'Décaféinés', 9, [R, E], ['cacao'], { color: '#6a2b74', photo: 'arpeggio-decaffeinato', url: 'arpeggio-decaffeinato-capsule-cafe', decaf: true }],
   ['ristretto-decaffeinato', 'Ristretto Decaffeinato', 'Décaféinés', 10, [R, E], ['torréfaction intense', 'fruité'], { color: '#26262b', photo: 'ristretto-decaffeinato', url: 'ristretto-decaffeinato-capsule-cafe', decaf: true }],
   ['volluto-decaffeinato', 'Volluto Decaffeinato', 'Décaféinés', 4, [E], ['fruité', 'délicat'], { color: '#9d6d20', photo: 'volluto-decaffeinato', url: 'volluto-decaffeinato-coffee-capsule', decaf: true }],
@@ -183,6 +181,15 @@ for (const [id, name, range, intensity, cups, aromas, x, slug] of lavazza) {
 for (const [id, name, range, x] of cafeRoyal) {
   add({ id: 'cafe-royal-' + id, brand_id: 'cafe-royal', name, range, aromas: x.aromas ?? [],
     decaf: !!x.decaf, flavoured: !!x.flavoured, shop_url: ROYAL });
+}
+
+// Photo officielle (affichée depuis le site de la marque) quand il n'y a pas de photo locale.
+// Liste produite par scripts/find-official-images.mjs.
+const OFFICIAL = existsSync(new URL('../data/official-images.json', import.meta.url))
+  ? JSON.parse(readFileSync(new URL('../data/official-images.json', import.meta.url), 'utf8').replace(/^﻿/, '')) : {};
+for (const p of products) {
+  p.official_image = OFFICIAL[p.id] ?? null;
+  if (!p.photo_url && p.official_image) p.photo_url = p.official_image;
 }
 
 // Contrôles : identifiants uniques, URL en https.

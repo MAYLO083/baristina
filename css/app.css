@@ -99,6 +99,9 @@ a.btn { display: block; text-align: center; text-decoration: none; }
 .capsule .brand-tag { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); padding: 1px 5px; border-radius: 6px; background: #fffaf1d9; font-size: 8px; font-weight: 700; white-space: nowrap; }
 .capsule.big .brand-tag { font-size: 11px; bottom: 10px; }
 
+.capsule img { background: #fff; border-radius: 10px; }
+.photo-credit { margin: -4px 0 6px; font-size: 10px; color: var(--muted); }
+
 /* Fiche capsule */
 .hero { padding: 6px 20px 14px; text-align: center; }
 .hero .brand { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--red); }

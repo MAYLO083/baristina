@@ -3,6 +3,7 @@
 //   1. l'apparence (modèle d'IA open source CLIP, comparé aux photos de référence) ;
 //   2. la couleur de la capsule (comparée à celle des photos de référence) ;
 //   3. le nom imprimé, lu par OCR (Tesseract), comparé au catalogue.
+// Références : photos locales + photos officielles des marques (seules leurs empreintes sont dans data/scan-index.json).
 // Le modèle (~90 Mo) est téléchargé au premier scan puis gardé en cache par le navigateur.
 // Aucune photo n'est envoyée sur internet.
 
@@ -61,6 +62,10 @@ function editSim(a, b) {
   }
   return 1 - prev[b.length] / Math.max(a.length, b.length);
 }
+const BRAND_PATTERNS = {
+  nespresso: /nespresso/, lor: /\bl ?or\b/, starbucks: /starbucks/, 'carte-noire': /carte ?noire/,
+  lavazza: /lavazza/, 'cafe-royal': /cafe ?royal/,
+};
 const GENERIC = new Set(['espresso', 'lungo', 'ristretto', 'capsule', 'capsules', 'coffee', 'cafe', 'roast', 'blend', 'the', 'and', 'des', 'les', 'aux']);
 // Score 0..1 : part des mots distinctifs du nom retrouvés dans le texte lu.
 function textScore(product, brand, words, fullText) {
@@ -114,8 +119,10 @@ function getOCR() {
 async function readText(canvas) {
   try {
     const worker = await getOCR();
-    const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
-    const x = c.getContext('2d'); x.filter = 'grayscale(1) contrast(1.6)'; x.drawImage(canvas, 0, 0);
+    // Image agrandie (≥ 1400 px) : les petits noms imprimés sur la capsule ou la boîte se lisent mieux.
+    const k = Math.max(1, 1400 / Math.max(canvas.width, canvas.height));
+    const c = document.createElement('canvas'); c.width = Math.round(canvas.width * k); c.height = Math.round(canvas.height * k);
+    const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.filter = 'grayscale(1) contrast(1.6)'; x.drawImage(canvas, 0, 0, c.width, c.height);
     // Au-delà de 10 s (appareil lent), on continue sans le texte plutôt que de bloquer le scan.
     const result = await Promise.race([worker.recognize(c), new Promise((res) => setTimeout(() => res(null), 10000))]);
     return result?.data?.text ?? '';
@@ -137,17 +144,22 @@ export async function identify(canvas, products, brandName, onProgress) {
 
   const list = products.filter((p) => index.items[p.id]);
   const entries = list.map((p) => index.items[p.id]);
-  const appearance = softmax(entries.map((e) => (e.i ? dot(q, e.i) : -1)), 100);
-  const colorRaw = entries.map((e) => (e.c ? Math.exp(-colorDistance(color, e.c) / 20) : 0));
+  // Plusieurs photos de référence par capsule (photo locale + photo officielle) : on garde la plus ressemblante.
+  const appearance = softmax(entries.map((e) => (e.r.length ? Math.max(...e.r.map((r) => dot(q, r))) : -1)), 100);
+  const colorRaw = entries.map((e) => (e.c.length ? Math.max(...e.c.map((c) => Math.exp(-colorDistance(color, c) / 20))) : 0));
   const colorSum = colorRaw.reduce((a, b) => a + b, 0) || 1;
   const byName = softmax(entries.map((e) => dot(q, e.t)), 100);
   const fullText = norm(text), words = [...new Set(fullText.split(' ').filter((w) => w.length >= 3))];
 
+  // Marque lue sur la capsule ou la boîte : ses capsules passent devant les autres.
+  const brandsSeen = new Set(Object.entries(BRAND_PATTERNS).filter(([, re]) => re.test(fullText)).map(([id]) => id));
+
   const scored = list.map((p, i) => {
     const ocr = textScore(p, brandName(p), words, fullText);
-    // Pondération mesurée sur les photos de référence (apparence 40 % / couleur 60 %),
-    // + un petit indice « nom » pour les capsules sans photo, + le texte lu, prioritaire.
-    const score = 0.4 * appearance[i] + 0.6 * (colorRaw[i] / colorSum) + 0.15 * byName[i] + 1.5 * ocr;
+    // Pondération mesurée sur les photos de référence (apparence / couleur),
+    // + un petit indice « nom » pour les capsules sans photo, + la marque et le nom lus, prioritaires.
+    const score = 0.4 * appearance[i] + 0.6 * (colorRaw[i] / colorSum) + 0.15 * byName[i]
+      + (brandsSeen.has(p.brand_id) ? 0.5 : 0) + 1.5 * ocr;
     return { p, score, ocr };
   }).sort((a, b) => b.score - a.score);
 
