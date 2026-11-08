@@ -1,6 +1,7 @@
 // Baristina V1 — index de reconnaissance d'images (IA gratuite, exécutée sur l'appareil).
 // Calcule avec le modèle open source CLIP une « empreinte » de chaque capsule :
-//   - à partir de ses photos de référence : photo locale (photos/…) et photo officielle de la marque ;
+//   - à partir de ses photos de référence : photo locale (photos/…), photo officielle de la marque
+//     et photos de la galerie officielle (capsule seule, côté de boîte : data/reference-images.json) ;
 //   - à partir de son nom et de sa marque (indice faible, pour les capsules sans photo).
 // Les photos officielles sont téléchargées dans scripts/.cache uniquement pour ce calcul :
 // seules les empreintes (nombres) sont publiées dans data/scan-index.json.
@@ -58,7 +59,8 @@ async function loadImage(src, crop = null) {
   if (crop) {
     const meta = await sharp(buf).metadata();
     const [x, y, w, h] = crop;
-    buf = await sharp(buf).extract({ left: Math.round(meta.width * x), top: Math.round(meta.height * y), width: Math.round(meta.width * w), height: Math.round(meta.height * h) }).png().toBuffer();
+    const left = Math.floor(meta.width * x), top = Math.floor(meta.height * y);
+    buf = await sharp(buf).extract({ left, top, width: Math.min(meta.width - left, Math.round(meta.width * w)), height: Math.min(meta.height - top, Math.round(meta.height * h)) }).png().toBuffer();
   }
   const { data, info } = await sharp(buf).flatten({ background: '#ffffff' }).resize(448, 448, { fit: 'contain', background: '#ffffff' })
     .removeAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -73,6 +75,10 @@ const [processor, tokenizer, vision, text] = await Promise.all([
   CLIPTextModelWithProjection.from_pretrained(MODEL, { dtype: 'q8' }),
 ]);
 
+// Photos de galerie (capsule seule, côté de boîte…) trouvées par find-reference-images.mjs.
+const GALLERY_FILE = path.join(ROOT, 'data', 'reference-images.json');
+const gallery = existsSync(GALLERY_FILE) ? JSON.parse(readFileSync(GALLERY_FILE, 'utf8').replace(/^﻿/, '')) : {};
+
 const index = {}, failed = [];
 for (const p of products) {
   const brand = brandName[p.brand_id];
@@ -81,10 +87,11 @@ for (const p of products) {
   const rows = t.text_embeds.tolist().map(normalize);
   const entry = { t: round(normalize(rows[0].map((_, i) => rows.reduce((s, r) => s + r[i], 0)))), r: [], c: [] };
 
-  const sources = [...new Set([p.photo_url && !/^https?:/.test(p.photo_url) ? p.photo_url : null, p.official_image].filter(Boolean))];
+  const sources = [...new Set([p.photo_url && !/^https?:/.test(p.photo_url) ? p.photo_url : null, p.official_image, ...(gallery[p.id] ?? [])].filter(Boolean))];
   for (const src of sources) {
     const official = /^https?:/.test(src);
-    for (const crop of official ? CROPS : [null]) {
+    // Recadrages pour la photo principale ; les photos de galerie (souvent la capsule seule) : image entière + centre.
+    for (const crop of !official ? [null] : src === p.official_image ? CROPS : [null, CROPS[4]]) {
       try {
         const { raw, small } = await loadImage(src, crop);
         const out = await vision(await processor(raw));

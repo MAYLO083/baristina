@@ -62,7 +62,9 @@ cd scripts && npm install && npm run seed && npm run index
 ```
 
 Références utilisées : tes photos (`photos/`) et les **photos officielles des marques**, dont la liste est dans
-`data/official-images.json` (générée par `node scripts/find-official-images.mjs`). Les photos officielles sont
+`data/official-images.json` (générée par `node scripts/find-official-images.mjs`), plus les autres photos de la
+galerie officielle de chaque capsule — souvent la **capsule seule**, indispensable pour reconnaître une capsule
+photographiée sans sa boîte — listées dans `data/reference-images.json` (`node scripts/find-reference-images.mjs`). Les photos officielles sont
 affichées dans le catalogue directement depuis le site de la marque (pas de copie) ; pour l'IA, elles sont
 téléchargées dans `scripts/.cache` (non publié) et seules leurs empreintes vont dans `data/scan-index.json`.
 Si une marque change ou bloque une image, l'app affiche l'illustration dessinée à la place.
