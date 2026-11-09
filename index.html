@@ -20,6 +20,7 @@
     <div class="home-visual"><img src="home-reference-clean.jpg" alt="Baristina — tasse et dosettes de café"></div>
     <div class="home-actions">
       <a class="action red" href="#/scanner"><span class="ico" aria-hidden="true">◎</span><span class="txt">Scanner une capsule</span><span class="arr">›</span></a>
+      <button class="action sage" data-action="open-moods"><span class="ico" aria-hidden="true">✦</span><span class="txt">Une envie ? Choisis ton humeur</span><span class="arr">›</span></button>
       <a class="action terracotta" href="#/collection"><span class="ico" aria-hidden="true">♡</span><span class="txt">Ma collection</span><span class="arr">›</span></a>
       <a class="action green" href="#/catalogue"><span class="ico" aria-hidden="true">☰</span><span class="txt">Catalogue</span><span class="arr">›</span></a>
       <a class="action brown" href="#/membres"><span class="ico" aria-hidden="true">⌕</span><span class="txt">Membres</span><span class="arr">›</span></a>
@@ -31,6 +32,7 @@
     <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Catalogue</h2><button class="icon-btn" data-action="toggle-filters" aria-label="Filtres">⚙</button></header>
     <div class="content">
       <input id="q" class="search" type="search" placeholder="Rechercher une capsule, une marque, un arôme…" autocomplete="off">
+      <button class="mood-banner" data-action="open-moods"><span class="mb-ico" aria-hidden="true">✦</span><span><b>Pas d’idée ?</b> Laisse-toi guider par ton humeur</span><span class="arr" aria-hidden="true">›</span></button>
       <div class="tabs three" id="system-tabs">
         <button data-system="all">Tous</button><button data-system="original">Original</button><button data-system="vertuo">Vertuo</button>
       </div>
@@ -88,6 +90,11 @@
     <div class="content" id="collection-content"></div>
   </section>
 
+  <section id="screen-mood" class="screen">
+    <header class="topbar"><button class="icon-btn" data-action="back" aria-label="Retour">‹</button><h2>Selon ton humeur</h2><button class="icon-btn" data-action="open-moods" aria-label="Changer d’humeur">✦</button></header>
+    <div id="mood-content"></div>
+  </section>
+
   <section id="screen-members" class="screen">
     <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Membres</h2><span class="icon-btn spacer"></span></header>
     <div class="content">
@@ -112,6 +119,7 @@
     <a href="#/scanner" data-nav="scan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Scanner</a>
     <a href="#/compte" data-nav="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Compte</a>
   </nav>
+  <div id="overlay" class="overlay" hidden></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </main>
 </body>

@@ -138,13 +138,154 @@ async function loadUserData() {
   S.collection = new Map((col.data ?? []).map((x) => [x.product_id, x]));
 }
 
+// ---------------------------------------------------------------- jauge d'intensité (sur 13)
+function intensityRing(p, cls = '') {
+  if (!p?.intensity) return '';
+  return `<span class="int-ring ${cls}" style="--p:${(p.intensity / 13 * 100).toFixed(1)}%" title="Intensité ${p.intensity} sur 13" aria-label="Intensité ${p.intensity} sur 13"><b>${p.intensity}</b><small>/13</small></span>`;
+}
+
+// ---------------------------------------------------------------- calque : pop-up et menus
+let overlayTimer;
+function openOverlay(html, kind) {
+  const o = $('overlay');
+  clearTimeout(overlayTimer);
+  o.className = 'overlay ' + kind; o.innerHTML = `<div class="overlay-bg" data-action="close-overlay"></div>${html}`;
+  o.hidden = false; document.body.classList.add('locked');
+  requestAnimationFrame(() => o.classList.add('open'));
+}
+function closeOverlay() {
+  const o = $('overlay'); if (o.hidden) return;
+  o.classList.remove('open'); o.classList.add('closing');
+  document.body.classList.remove('locked');
+  overlayTimer = setTimeout(() => { o.hidden = true; o.innerHTML = ''; o.className = 'overlay'; }, 260);
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
+
+// ---------------------------------------------------------------- suggestion après un « j'aime »
+// Même marque, même intensité sur 13 (à défaut, la plus proche), pas encore dans la collection.
+function suggestionsFor(p) {
+  const pool = S.products.filter((x) => x.id !== p.id && x.brand_id === p.brand_id && !S.collection.has(x.id));
+  const sim = (x) => (x.system === p.system ? 8 : 0) + (x.range && x.range === p.range ? 3 : 0) + (x.decaf === p.decaf ? 6 : 0)
+    + (x.aromas ?? []).filter((a) => p.aromas?.includes(a)).length * 2 + (x.photo_url ? 1 : 0);
+  const sort = (list) => list.map((x) => [x, sim(x) + Math.random()]).sort((a, b) => b[1] - a[1]).map(([x]) => x);
+  if (!p.intensity) return { list: sort(pool.filter((x) => !x.intensity || x.range === p.range)).slice(0, 6), exact: false };
+  const rated = pool.filter((x) => x.intensity);
+  const exact = rated.filter((x) => x.intensity === p.intensity);
+  if (exact.length) return { list: sort(exact).slice(0, 6), exact: true };
+  const best = Math.min(...rated.map((x) => Math.abs(x.intensity - p.intensity)));
+  if (!rated.length || best > 2) return { list: [], exact: false };
+  return { list: sort(rated.filter((x) => Math.abs(x.intensity - p.intensity) === best)).slice(0, 6), exact: false };
+}
+const SUG = { from: null, list: [], exact: false, i: 0 };
+function openSuggestion(fromId) {
+  const p = S.byId.get(fromId); if (!p) return false;
+  const { list, exact } = suggestionsFor(p);
+  if (!list.length) return false;
+  Object.assign(SUG, { from: p, list, exact, i: 0 });
+  openOverlay(`<div class="pop" role="dialog" aria-modal="true" aria-labelledby="pop-title">${suggestionHTML()}</div>`, 'center');
+  return true;
+}
+function suggestionHTML() {
+  const p = SUG.from, x = SUG.list[SUG.i];
+  const why = !p.intensity ? `Même marque, dans le même esprit que ${esc(p.name)}`
+    : SUG.exact ? `Même marque, même intensité : <b>${p.intensity}/13</b>`
+    : `Même marque, intensité la plus proche : <b>${x.intensity}/13</b> (au lieu de ${p.intensity})`;
+  const hearts = Array.from({ length: 10 }, (_, k) => `<i style="--k:${k}">♥</i>`).join('');
+  const sys = x.system !== p.system ? `<span class="badge">${esc(SYSTEM_NAME[x.system])}</span>` : '';
+  return `<div class="burst" aria-hidden="true">${hearts}</div>
+    <button class="pop-close" data-action="close-overlay" aria-label="Fermer">×</button>
+    <div class="pop-liked"><span class="heart">♥</span> ${esc(p.name)} est dans ta collection</div>
+    <h3 id="pop-title">Tu devrais aussi aimer…</h3>
+    <p class="pop-why">${why}</p>
+    <div class="pop-card" data-k="${SUG.i}">
+      <div class="pop-visual">${capsuleHTML(x, true).replace(/<p class="photo-credit">.*?<\/p>/, '')}${intensityRing(x, 'big')}</div>
+      <div class="pop-brand">${esc(brandName(x))}</div>
+      <div class="pop-name">${esc(x.name)}</div>
+      ${x.range ? `<div class="pop-range">${esc(x.range)}</div>` : ''}
+      ${x.aromas?.length ? `<div class="pop-aromas">${x.aromas.slice(0, 3).map((a) => `<span>${esc(a)}</span>`).join('')}</div>` : ''}
+      ${sys}
+    </div>
+    <div class="pop-actions">
+      <a class="btn" href="#/capsule/${encodeURIComponent(x.id)}" data-action="close-overlay">Découvrir</a>
+      <button class="btn secondary" data-action="sug-add" data-id="${esc(x.id)}">♡ L’ajouter aussi</button>
+    </div>
+    ${SUG.list.length > 1 ? `<button class="link-btn" data-action="sug-next">Une autre idée (${SUG.i + 1}/${SUG.list.length}) ↻</button>` : ''}`;
+}
+
+// ---------------------------------------------------------------- humeurs : « pas d'idée ? »
+// Chaque humeur note les capsules à partir des faits enregistrés (intensité, arômes, tasses, gamme…).
+const txt = (p) => norm([...(p.aromas ?? []), p.highlight, p.name].join(' '));
+const has = (p, re) => re.test(txt(p));
+const cups = (p, re) => (p.cup_sizes ?? []).some((c) => re.test(c));
+const ITALIAN = new Set(['lavazza', 'kimbo', 'borbone', 'segafredo', 'illy']);
+const MOODS = [
+  { id: 'douceur', emoji: '☁️', name: 'Tout en douceur', line: 'Rond, léger, sans amertume : pour commencer en douceur.', c: ['#b08460', '#d4ae86'],
+    score: (p) => (p.intensity >= 9 ? -9 : 0) + (p.intensity && p.intensity <= 6 ? 2 : 0) + (has(p, /doux|rond|velout|delicat|biscuit|cereales douces|lacte|cremeux|miel|leger|torrefaction legere/) ? 1 : 0) + (p.roast === 'blonde' ? 1 : 0) },
+  { id: 'energie', emoji: '⚡', name: 'Coup de boost', line: 'Réveil difficile ? Du corsé, du caractère, du punch.', c: ['#76202a', '#c4513f'],
+    score: (p) => (p.decaf ? -9 : 0) + (p.intensity >= 10 ? 2 : 0) + (p.intensity >= 12 ? 1 : 0) + (has(p, /intense|corse|robusta|robuste|ginseng|intensement|torrefaction intense|caf(e|ei)ne/) ? 1 : 0) + (/coffee\+|double espresso/i.test(p.range ?? '') ? 1 : 0) + (p.roast === 'dark' ? 1 : 0) },
+  { id: 'gourmand', emoji: '🍫', name: 'Gourmandise', line: 'Caramel, chocolat, vanille… une envie sucrée sans le sucre.', c: ['#8a5a3b', '#d9a066'],
+    score: (p) => (p.flavoured ? 2 : 0) + (has(p, /caramel|chocolat|vanill|noisette|biscuit|brownie|cheesecake|miel|amande|cacao|praline/) ? 1 : 0) },
+  { id: 'cocooning', emoji: '🧣', name: 'Cocooning', line: 'Plaid, pluie qui tombe et grande tasse entre les mains.', c: ['#3e2a24', '#a0705a'], min: 2,
+    score: (p) => (has(p, /cacao|chocolat|biscuit|cereales grillees|caramel|pain grille|malt|noisette|miel|fruits secs|cremeux|velout/) ? 1 : 0) + (cups(p, /lungo|mug|lait|cappuccino/i) ? 1 : 0) + (p.intensity >= 5 && p.intensity <= 9 ? 1 : 0) },
+  { id: 'hiver', emoji: '❄️', name: 'Esprit d’hiver', line: 'Épices, bois et feu de cheminée : la saison froide en tasse.', c: ['#2f4a5c', '#8fa9b8'],
+    score: (p) => (has(p, /epic|epice|citrouille|pumpkin|chataigne|boise|fume|chene|cannelle|spice|hiver|winter|noel/) ? 2 : 0) + (has(p, /grille|cacao|torrefaction intense/) ? 1 : 0) + (p.intensity >= 8 ? 1 : 0) + (p.limited ? 1 : 0), min: 3 },
+  { id: 'soleil', emoji: '☀️', name: 'Rayon de soleil', line: 'Fruité, floral, lumineux… ou carrément glacé.', c: ['#c77651', '#f0c27a'], min: 2,
+    score: (p) => (/glac/i.test(p.highlight ?? '') ? 3 : 0) + (has(p, /fruit|agrume|citri|floral|fleur|jasmin|yuzu|baie|myrtille|acidit|tropical|coco|hibiscus/) ? 2 : 0) + (p.intensity && p.intensity <= 6 ? 1 : 0) },
+  { id: 'evasion', emoji: '🌍', name: 'Évasion', line: 'Un aller simple vers les plantations du bout du monde.', c: ['#1e5b45', '#6e8a6b'],
+    score: (p) => (p.origin ? 2 : 0) + (/origin|exploration/i.test(p.range ?? '') ? 2 : 0) + (has(p, /tropical|coco|yuzu|kona|hawaii|colombia|ethiopia|guatemala|sumatra|peru|brasil|india/) ? 1 : 0) },
+  { id: 'dolcevita', emoji: '☕', name: 'Dolce vita', line: 'Ristretto serré au comptoir, comme à Naples ou à Rome.', c: ['#173a23', '#c6aa67'], min: 2,
+    score: (p) => (/ital|qualita|origini|respresso|napoli|roma/i.test((p.range ?? '') + ' ' + p.name) ? 2 : 0) + (ITALIAN.has(p.brand_id) ? 2 : 0) + (cups(p, /ristretto/i) ? 1 : 0) + (p.intensity >= 9 ? 1 : 0) },
+  { id: 'latte', emoji: '🥛', name: 'Pause latte', line: 'Pour mousser, napper, faire un cappuccino maison.', c: ['#8f6f52', '#c9a983'],
+    score: (p) => (cups(p, /lait|cappuccino/i) ? 2 : 0) + (/lait/i.test(p.highlight ?? '') ? 2 : 0) + (/barista/i.test(p.range ?? '') ? 1 : 0) + (/bianco|oatly|latte|barista/i.test(p.name) ? 1 : 0) },
+  { id: 'soiree', emoji: '🌙', name: 'Douce soirée', line: 'Le goût du café le soir, et le sommeil en prime.', c: ['#2b2540', '#6a2b72'],
+    score: (p) => (p.decaf ? 3 : 0) + (/mi-caf/i.test(p.highlight ?? '') ? 2 : 0) },
+];
+const MOOD = { id: null, system: 'all' };
+function moodList(m) {
+  return S.products.map((p) => [p, m.score(p)]).filter(([, s]) => s >= (m.min ?? 1))
+    .sort((a, b) => b[1] - a[1] || a[0].name.localeCompare(b[0].name, 'fr')).map(([p]) => p);
+}
+function openMoods() {
+  const tiles = MOODS.map((m, i) => `<a class="mood" href="#/humeur/${m.id}" data-action="close-overlay" style="--c1:${m.c[0]};--c2:${m.c[1]};--d:${i}">
+      <span class="mood-emoji" aria-hidden="true">${m.emoji}</span><b>${esc(m.name)}</b><small>${esc(m.line)}</small></a>`).join('');
+  openOverlay(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="moods-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <button class="pop-close" data-action="close-overlay" aria-label="Fermer">×</button>
+    <h3 id="moods-title">Quelle est ton humeur ?</h3>
+    <p class="sheet-sub">Choisis une envie, on te trouve les capsules qui vont avec.</p>
+    <div class="moods">${tiles}</div>
+    <button class="btn secondary" data-action="mood-random">🎲 Surprends-moi complètement</button>
+  </div>`, 'bottom');
+}
+function renderMood() {
+  const box = $('mood-content');
+  const m = MOODS.find((x) => x.id === MOOD.id);
+  if (!m) { box.innerHTML = '<div class="empty">Cette humeur n’existe pas.</div>'; return; }
+  if (!S.loaded) { box.innerHTML = '<div class="loading">Chargement…</div>'; return; }
+  const all = moodList(m);
+  const list = all.filter((p) => MOOD.system === 'all' || p.system === MOOD.system);
+  const tabs = [['all', 'Tous'], ['original', 'Original'], ['vertuo', 'Vertuo']]
+    .map(([k, n]) => `<button class="${MOOD.system === k ? 'on' : ''}" data-msys="${k}">${n}</button>`).join('');
+  box.innerHTML = `<div class="mood-hero" style="--c1:${m.c[0]};--c2:${m.c[1]}">
+      <span class="mood-emoji big" aria-hidden="true">${m.emoji}</span>
+      <h1>${esc(m.name)}</h1><p>${esc(m.line)}</p>
+      <div class="mood-cta"><button class="pill" data-action="mood-surprise">🎲 Surprends-moi</button><button class="pill ghost" data-action="open-moods">Changer d’humeur</button></div>
+    </div>
+    <div class="content">
+      <div class="tabs three">${tabs}</div>
+      <p class="result-count">${list.length} capsule${list.length > 1 ? 's' : ''} pour cette humeur</p>
+      <div class="mood-list">${list.length ? list.map(cardHTML).join('') : '<div class="empty">Aucune capsule de ce format pour cette humeur.</div>'}</div>
+    </div>`;
+}
+
 // ---------------------------------------------------------------- navigation
 const ROUTES = { '': 'home', catalogue: 'catalog', scanner: 'scan', collection: 'collection', compte: 'account', membres: 'members' };
-const SCREENS = { home: 'screen-home', catalog: 'screen-catalog', detail: 'screen-detail', scan: 'screen-scan', collection: 'screen-collection', account: 'screen-account', members: 'screen-members', profile: 'screen-profile' };
+const SCREENS = { home: 'screen-home', catalog: 'screen-catalog', detail: 'screen-detail', scan: 'screen-scan', collection: 'screen-collection', account: 'screen-account', members: 'screen-members', profile: 'screen-profile', mood: 'screen-mood' };
 let detailId = null;
 function route() {
   const [a, b] = location.hash.replace(/^#\/?/, '').split('/');
   if (a === 'capsule' && b) { detailId = decodeURIComponent(b); R.delete(detailId); show('detail'); return; } // avis rechargés à chaque ouverture
+  if (a === 'humeur' && b) { if (MOOD.id !== b) MOOD.system = 'all'; MOOD.id = b; show('mood'); return; }
   if (a === 'profil' && b) { openProfile(decodeURIComponent(b)); show('profile'); return; }
   // « Compte » : mon profil public (modification via #/compte/modifier) ; sinon connexion / choix du pseudo.
   if (a === 'compte') {
@@ -154,10 +295,12 @@ function route() {
   show(ROUTES[a] ?? 'home');
 }
 function show(name) {
+  closeOverlay();
   if (S.screen === 'catalog') S.catalogScroll = window.scrollY;
   if (S.screen === 'scan' && name !== 'scan') stopCamera();
   S.screen = name;
   for (const [k, id] of Object.entries(SCREENS)) $(id).classList.toggle('active', k === name);
+  document.body.classList.add('entering'); clearTimeout(show.t); show.t = setTimeout(() => document.body.classList.remove('entering'), 900);
   document.body.classList.toggle('on-home', name === 'home');
   const navKey = location.hash.startsWith('#/compte') ? 'account' : name;
   document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('active', a.dataset.nav === navKey));
@@ -170,7 +313,7 @@ function render() {
   $('home-avatar').innerHTML = S.profile?.username ? avatarHTML(S.profile)
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
   $('home-avatar').setAttribute('aria-label', S.profile?.username ? `Mon profil (${S.profile.username})` : 'Se connecter');
-  ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile })[S.screen]?.();
+  ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
 }
 window.addEventListener('hashchange', route);
 
@@ -195,8 +338,8 @@ function filtered() {
 }
 function cardHTML(p) {
   const item = S.collection.get(p.id);
-  const tags = [p.system === 'vertuo' ? 'Vertuo' : null, p.intensity ? `Intensité ${p.intensity}` : null, p.decaf ? 'Déca' : null, p.flavoured ? 'Aromatisé' : null, p.organic ? 'Bio' : null, p.limited ? 'Édition limitée' : null].filter(Boolean);
-  return `<a class="card" href="#/capsule/${encodeURIComponent(p.id)}">${capsuleHTML(p)}<div class="meta"><strong>${esc(p.name)}</strong><span class="sub">${esc(brandName(p))}${tags.length ? ' · ' + esc(tags.join(' · ')) : ''}</span></div>${item ? `<span class="qty">×${item.quantity}</span>` : ''}</a>`;
+  const tags = [p.system === 'vertuo' ? 'Vertuo' : null, p.decaf ? 'Déca' : null, p.flavoured ? 'Aromatisé' : null, p.organic ? 'Bio' : null, p.limited ? 'Édition limitée' : null].filter(Boolean);
+  return `<a class="card" href="#/capsule/${encodeURIComponent(p.id)}">${capsuleHTML(p)}<div class="meta"><strong>${esc(p.name)}</strong><span class="sub">${esc(brandName(p))}${tags.length ? ' · ' + esc(tags.join(' · ')) : ''}</span></div>${intensityRing(p)}${item ? `<span class="qty">×${item.quantity}</span>` : ''}</a>`;
 }
 function renderFilterControls() {
   const f = S.filters;
@@ -253,7 +396,7 @@ function renderDetail() {
   const p = S.byId.get(detailId);
   if (!p) { box.innerHTML = '<div class="empty">Cette capsule est introuvable.</div>'; return; }
   let dots = '';
-  if (p.intensity) for (let i = 1; i <= 13; i++) dots += `<span class="dot${i > p.intensity ? ' off' : ''}"></span>`;
+  if (p.intensity) for (let i = 1; i <= 13; i++) dots += `<span class="dot${i > p.intensity ? ' off' : ''}" style="--i:${i}"></span>`;
   const badges = [`<span class="badge">${esc(SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original)}</span>`, p.intensity ? `<span class="badge purple">Intensité ${p.intensity}/13</span>` : '',
     p.decaf ? '<span class="badge">Décaféiné</span>' : '', p.flavoured ? '<span class="badge">Aromatisé</span>' : '',
     p.organic ? '<span class="badge">Bio</span>' : '', p.limited ? '<span class="badge">Édition limitée</span>' : ''].join('');
@@ -571,6 +714,8 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- actions (délégation : pas de JS inline)
 document.addEventListener('click', async (e) => {
+  const msys = e.target.closest('[data-msys]');
+  if (msys) { MOOD.system = msys.dataset.msys; renderMood(); return; }
   const sysTab = e.target.closest('[data-system]');
   if (sysTab) { S.filters.system = sysTab.dataset.system; renderCatalog(); return; }
   const brandChip = e.target.closest('[data-brand]');
@@ -583,7 +728,26 @@ document.addEventListener('click', async (e) => {
     case 'toggle-filters': $('filters-panel').hidden = !$('filters-panel').hidden; break;
     case 'reset-filters': S.filters = { ...defaultFilters(), q: $('q').value }; renderCatalog(); break;
     case 'back': history.length > 1 ? history.back() : (location.hash = '#/catalogue'); break;
-    case 'add': if (await saveItem(id, { quantity: 1 })) toast('Ajoutée à ta collection ✓'); break;
+    case 'add': if (await saveItem(id, { quantity: 1 }) && !openSuggestion(id)) toast('Ajoutée à ta collection ✓'); break;
+    case 'close-overlay': closeOverlay(); break;
+    case 'sug-next': {
+      SUG.i = (SUG.i + 1) % SUG.list.length;
+      const pop = document.querySelector('#overlay .pop'); if (pop) pop.innerHTML = suggestionHTML();
+      break;
+    }
+    case 'sug-add': {
+      if (!(await saveItem(id, { quantity: 1 }))) break;
+      if (!openSuggestion(id)) { closeOverlay(); toast('Ajoutée à ta collection ✓'); }
+      break;
+    }
+    case 'open-moods': openMoods(); break;
+    case 'mood-random': { const m = MOODS[Math.floor(Math.random() * MOODS.length)]; location.hash = '#/humeur/' + m.id; break; }
+    case 'mood-surprise': {
+      const m = MOODS.find((x) => x.id === MOOD.id); if (!m) break;
+      const list = moodList(m).filter((p) => MOOD.system === 'all' || p.system === MOOD.system);
+      if (list.length) location.hash = '#/capsule/' + encodeURIComponent(list[Math.floor(Math.random() * list.length)].id);
+      break;
+    }
     case 'qty': {
       const q = (S.collection.get(id)?.quantity ?? 0) + Number(el.dataset.delta);
       if (q <= 0) removeItem(id); else saveItem(id, { quantity: q });
