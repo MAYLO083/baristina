@@ -257,8 +257,48 @@ for (const [id, name, aromas, x, handle] of borbone) {
 // Liste produite par scripts/find-official-images.mjs.
 const OFFICIAL = existsSync(new URL('../data/official-images.json', import.meta.url))
   ? JSON.parse(readFileSync(new URL('../data/official-images.json', import.meta.url), 'utf8').replace(/^﻿/, '')) : {};
+
+// Intensité sur 13 pour les capsules dont la fiche officielle française ne la donne pas.
+// Valeur publiée ailleurs (autre pays, distributeur officiel, revendeur) : [valeur, false].
+// Valeur estimée (même base de café, échelle de la marque ramenée sur 13, gamme de torréfaction) : [valeur, true].
+// Relevé web du 2026-11-09.
+const INTENSITY_FILL = {
+  // Nespresso Original
+  'nespresso-vaniglia': [6, false], 'nespresso-caramello': [6, true], 'nespresso-nocciola': [6, true],
+  'nespresso-chiaro': [5, false], 'nespresso-scuro': [7, false], 'nespresso-corto': [11, false], 'nespresso-cafe-joyeux': [5, false],
+  'nespresso-hazelnut-brownie-flavoured': [6, true], 'nespresso-blueberry-cheesecake-flavoured': [6, true], 'nespresso-pumpkin-spice-cake': [6, true],
+  'nespresso-coconut-vanilla-flavour-over-ice': [6, true], 'nespresso-yuzu-vanilla-over-ice': [6, true],
+  // Nespresso Vertuo
+  'nespresso-vertuo-hawaii-kona': [6, false], 'nespresso-vertuo-bianco-forte': [9, true], 'nespresso-vertuo-bianco-doppio': [6, true],
+  'nespresso-vertuo-golden-caramel': [6, true], 'nespresso-vertuo-roasted-hazelnut': [6, true], 'nespresso-vertuo-sweet-vanilla': [6, true],
+  'nespresso-vertuo-sweet-vanilla-decaffeinato': [6, true], 'nespresso-vertuo-active': [7, true], 'nespresso-vertuo-ginseng-delight': [7, true],
+  'nespresso-vertuo-oatly-barista-edition': [7, true], 'nespresso-vertuo-coconut-vanilla-flavour-over-ice': [6, true],
+  'nespresso-vertuo-yuzu-vanilla-over-ice': [6, true], 'nespresso-vertuo-french-lavender-and-vanilla-decaffeinato': [5, true],
+  'nespresso-vertuo-sweet-almond-and-hibiscus': [6, true],
+  // L'Or aromatisés (5 sur les sites L'Or britannique et irlandais)
+  'lor-espresso-caramel': [5, false], 'lor-espresso-vanille': [5, false], 'lor-espresso-noisette': [5, true], 'lor-espresso-chocolat': [5, true],
+  'lor-dubai-chocolate-style': [5, true], 'lor-coconut-iced': [5, true], 'lor-pumpkin-spice': [5, true],
+  // Starbucks by Nespresso (Original) — Starbucks : blonde 4-6, medium 7-9, dark 10-12
+  'starbucks-espresso-roast': [11, false], 'starbucks-italian-style-roast': [11, false], 'starbucks-caffe-verona': [10, false],
+  'starbucks-single-origin-sumatra': [10, false], 'starbucks-pike-place-roast': [7, false], 'starbucks-single-origin-colombia': [7, false],
+  'starbucks-blonde-espresso-roast': [6, false], 'starbucks-house-blend': [8, true], 'starbucks-breakfast-blend': [7, true],
+  'starbucks-sunny-day-blend': [6, true], 'starbucks-single-origin-guatemala': [6, true],
+  // illy : échelle sur 9 ramenée sur 13
+  'illy-classico': [7, true], 'illy-intenso': [10, true], 'illy-forte': [13, true], 'illy-decaffeinato': [7, true],
+  'illy-classico-lungo': [7, true], 'illy-intenso-lungo': [10, true],
+  // Segafredo : intensité sur 13 indiquée par la marque
+  'segafredo-intenso': [12, false], 'segafredo-ristretto': [11, false], 'segafredo-classico': [10, false],
+  'segafredo-100-arabica': [9, false], 'segafredo-peru': [9, false], 'segafredo-brasile': [8, false],
+  // Borbone : échelle sur 10 ramenée sur 13
+  'borbone-respresso-black': [13, true], 'borbone-respresso-red': [12, true], 'borbone-respresso-blue': [10, true],
+  'borbone-respresso-gold': [9, true], 'borbone-respresso-dek-green': [10, true], 'borbone-respresso-light': [10, true],
+};
+
 for (const p of products) {
   p.official_image = OFFICIAL[p.id] ?? p.official_image;
+  p.intensity_estimated = false;
+  if (!p.intensity && INTENSITY_FILL[p.id]) [p.intensity, p.intensity_estimated] = INTENSITY_FILL[p.id];
+  if (/^Intensité \d+ indiquée sur la boîte$/.test(p.highlight ?? '')) p.highlight = null;
   if (!p.photo_url && p.official_image) p.photo_url = p.official_image;
 }
 
@@ -292,9 +332,9 @@ for (const br of BRANDS) {
 sql += `\n-- Les références retirées des sites ne sont pas supprimées (collections existantes) : elles sont masquées.\n`;
 sql += `update public.products set active = false where id not in (${products.map((p) => q(p.id)).join(', ')});\n\n`;
 for (const p of products) {
-  sql += `insert into public.products (id, brand_id, system, name, range, intensity, cup_sizes, aromas, origin, roast, highlight, decaf, flavoured, organic, limited, color, photo_url, shop_url, verified_on, active)
-values (${q(p.id)}, ${q(p.brand_id)}, ${q(p.system)}, ${q(p.name)}, ${q(p.range)}, ${p.intensity ?? 'null'}, ${arr(p.cup_sizes)}, ${arr(p.aromas)}, ${q(p.origin)}, ${q(p.roast)}, ${q(p.highlight)}, ${b(p.decaf)}, ${b(p.flavoured)}, ${b(p.organic)}, ${b(p.limited)}, ${q(p.color)}, ${q(p.photo_url)}, ${q(p.shop_url)}, '${VERIFIED}', true)
-on conflict (id) do update set brand_id = excluded.brand_id, system = excluded.system, name = excluded.name, range = excluded.range, intensity = excluded.intensity, cup_sizes = excluded.cup_sizes, aromas = excluded.aromas, origin = excluded.origin, roast = excluded.roast, highlight = excluded.highlight, decaf = excluded.decaf, flavoured = excluded.flavoured, organic = excluded.organic, limited = excluded.limited, color = excluded.color, photo_url = coalesce(public.products.photo_url, excluded.photo_url), shop_url = excluded.shop_url, verified_on = excluded.verified_on, active = true;\n`;
+  sql += `insert into public.products (id, brand_id, system, name, range, intensity, cup_sizes, aromas, origin, roast, highlight, decaf, flavoured, organic, limited, color, photo_url, shop_url, verified_on, active, intensity_estimated)
+values (${q(p.id)}, ${q(p.brand_id)}, ${q(p.system)}, ${q(p.name)}, ${q(p.range)}, ${p.intensity ?? 'null'}, ${arr(p.cup_sizes)}, ${arr(p.aromas)}, ${q(p.origin)}, ${q(p.roast)}, ${q(p.highlight)}, ${b(p.decaf)}, ${b(p.flavoured)}, ${b(p.organic)}, ${b(p.limited)}, ${q(p.color)}, ${q(p.photo_url)}, ${q(p.shop_url)}, '${VERIFIED}', true, ${b(p.intensity_estimated)})
+on conflict (id) do update set brand_id = excluded.brand_id, system = excluded.system, name = excluded.name, range = excluded.range, intensity = excluded.intensity, cup_sizes = excluded.cup_sizes, aromas = excluded.aromas, origin = excluded.origin, roast = excluded.roast, highlight = excluded.highlight, decaf = excluded.decaf, flavoured = excluded.flavoured, organic = excluded.organic, limited = excluded.limited, color = excluded.color, photo_url = coalesce(public.products.photo_url, excluded.photo_url), shop_url = excluded.shop_url, verified_on = excluded.verified_on, active = true, intensity_estimated = excluded.intensity_estimated;\n`;
 }
 sql += 'commit;\n';
 

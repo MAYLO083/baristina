@@ -91,7 +91,9 @@ function describe(p) {
   const range = p.range && !/^capsules/i.test(p.range) ? ` de la gamme ${p.range}` : '';
   out.push(`${p.name} est une capsule ${brandName(p)}${range}, au format ${SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original}.`);
   if (p.system === 'vertuo') out.push('Elle ne fonctionne qu’avec les machines Nespresso Vertuo.');
-  if (p.intensity) out.push(`Son intensité est de ${p.intensity} sur 13 selon la marque : c’est un café ${intensityWord(p.intensity)}.`);
+  if (p.intensity) out.push(p.intensity_estimated
+    ? `La marque ne publie pas d’intensité sur 13 : nous l’estimons à ${p.intensity}, c’est un café ${intensityWord(p.intensity)}.`
+    : `Son intensité est de ${p.intensity} sur 13 : c’est un café ${intensityWord(p.intensity)}.`);
   if (p.roast) out.push(`Sa torréfaction est ${ROAST[p.roast]}.`);
   if (p.aromas?.length) out.push(`${p.flavoured ? 'Saveur annoncée' : 'Profil aromatique'} : ${joinFr(p.aromas)}.`);
   if (p.origin) out.push(`Origine : ${p.origin}.`);
@@ -141,7 +143,8 @@ async function loadUserData() {
 // ---------------------------------------------------------------- jauge d'intensité (sur 13)
 function intensityRing(p, cls = '') {
   if (!p?.intensity) return '';
-  return `<span class="int-ring ${cls}" style="--p:${(p.intensity / 13 * 100).toFixed(1)}%" title="Intensité ${p.intensity} sur 13" aria-label="Intensité ${p.intensity} sur 13"><b>${p.intensity}</b><small>/13</small></span>`;
+  const est = p.intensity_estimated ? ' estimée' : '';
+  return `<span class="int-ring ${cls}${est ? ' est' : ''}" style="--p:${(p.intensity / 13 * 100).toFixed(1)}%" title="Intensité${est} ${p.intensity} sur 13" aria-label="Intensité${est} ${p.intensity} sur 13"><b>${est ? '≈' : ''}${p.intensity}</b><small>/13</small></span>`;
 }
 
 // ---------------------------------------------------------------- calque : pop-up et menus
@@ -397,11 +400,11 @@ function renderDetail() {
   if (!p) { box.innerHTML = '<div class="empty">Cette capsule est introuvable.</div>'; return; }
   let dots = '';
   if (p.intensity) for (let i = 1; i <= 13; i++) dots += `<span class="dot${i > p.intensity ? ' off' : ''}" style="--i:${i}"></span>`;
-  const badges = [`<span class="badge">${esc(SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original)}</span>`, p.intensity ? `<span class="badge purple">Intensité ${p.intensity}/13</span>` : '',
+  const badges = [`<span class="badge">${esc(SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original)}</span>`, p.intensity ? `<span class="badge purple">Intensité ${p.intensity_estimated ? '≈ ' : ''}${p.intensity}/13${p.intensity_estimated ? ' (estimée)' : ''}</span>` : '',
     p.decaf ? '<span class="badge">Décaféiné</span>' : '', p.flavoured ? '<span class="badge">Aromatisé</span>' : '',
     p.organic ? '<span class="badge">Bio</span>' : '', p.limited ? '<span class="badge">Édition limitée</span>' : ''].join('');
   const facts = [
-    ['Marque', brandName(p)], ['Format', SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original], ['Gamme', p.range], ['Intensité', p.intensity ? `${p.intensity} / 13` : null],
+    ['Marque', brandName(p)], ['Format', SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original], ['Gamme', p.range], ['Intensité', p.intensity ? `${p.intensity} / 13${p.intensity_estimated ? ' (estimée)' : ''}` : null],
     ['Torréfaction', p.roast ? ROAST[p.roast] : null], ['Arômes', p.aromas?.length ? joinFr(p.aromas) : null],
     ['Origine', p.origin], ['Tasse', p.cup_sizes?.length ? p.cup_sizes.join(' · ') : null], ['Particularité', p.highlight],
   ].filter(([, v]) => v).map(([k, v]) => `<div class="fact"><small>${esc(k)}</small><span>${esc(v)}</span></div>`).join('');

@@ -209,6 +209,8 @@ a.btn { display: block; text-align: center; text-decoration: none; }
 .int-ring { --p: 50%; flex: none; position: relative; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   background: radial-gradient(closest-side, var(--white) 76%, transparent 78%), conic-gradient(#6a2b72 var(--p), #e6dccb 0); color: #4d1f53; }
 .int-ring b { font-size: 14px; line-height: 1; }
+.int-ring.est { background: radial-gradient(closest-side, var(--white) 76%, transparent 78%), conic-gradient(#a77bb0 var(--p), #e6dccb 0); }
+.int-ring.est b { font-size: 12px; letter-spacing: -.5px; }
 .int-ring small { font-size: 8px; font-weight: 600; color: var(--muted); }
 .int-ring.big { position: absolute; right: 18%; bottom: 6px; width: 54px; height: 54px; box-shadow: 0 4px 12px #0002; border-radius: 50%; }
 .int-ring.big b { font-size: 19px; }

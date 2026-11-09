@@ -127,6 +127,8 @@ create table if not exists public.products (
 );
 create index if not exists products_brand_idx on public.products (brand_id);
 alter table public.products add column if not exists system text not null default 'original' check (system in ('original', 'vertuo'));
+-- Intensité estimée (non publiée par la marque) : affichée « estimée » dans l'app.
+alter table public.products add column if not exists intensity_estimated boolean not null default false;
 
 alter table public.brands   enable row level security;
 alter table public.products enable row level security;
