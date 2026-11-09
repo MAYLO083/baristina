@@ -1,0 +1,1632 @@
+{
+ "source": "https://www.nespresso.com/fr/fr/order/capsules/vertuo",
+ "fetched": "2026-11-09",
+ "items": [
+  {
+   "system": "original",
+   "slug": "barista-caramello-caspule-cafe",
+   "name": "Caramello",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Saveur caramel",
+    "Biscuits",
+    "Noisette et chocolat"
+   ],
+   "cups": [
+    "Lungo",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/50854326370334/OL-Caramello-1-.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/barista-caramello-caspule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "barista-chiaro-capsule-cafe",
+   "name": "Chiaro",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Biscuits"
+   ],
+   "cups": [
+    "Ristretto",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653521485854/chiaro-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/barista-chiaro-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "barista-corto-capsule-cafe",
+   "name": "Corto",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Epicé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653730414622/corto-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/barista-corto-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "barista-nocciola-caspule-cafe",
+   "name": "Nocciola",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Biscuits",
+    "Céréales",
+    "Noisette",
+    "Céréales grillées"
+   ],
+   "cups": [
+    "Lungo",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/48884431880222/OL-Nocciola.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/barista-nocciola-caspule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "barista-scuro-capsule-cafe",
+   "name": "Scuro",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Grillé",
+    "Équilibré"
+   ],
+   "cups": [
+    "Ristretto",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16654104068126/scuro-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/barista-scuro-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "barista-vaniglia-caspule-cafe",
+   "name": "Vaniglia",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Biscuits",
+    "Céréales",
+    "Saveur de vanille"
+   ],
+   "cups": [
+    "Lungo",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17432222531614/C-1062-Responsive-PLP.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/barista-vaniglia-caspule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "colombia-capsule-cafe",
+   "name": "Colombia",
+   "range": "Cafés d'origine",
+   "intensity": 6,
+   "aromas": [
+    "Vin et fruité"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653527384094/colombia-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/colombia-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "ethiopia-organic-original",
+   "name": "Ethiopia",
+   "range": "Cafés d'origine",
+   "intensity": 4,
+   "aromas": [
+    "Floral",
+    "Fruité"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/28203795283998.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/ethiopia-organic-original"
+  },
+  {
+   "system": "original",
+   "slug": "india-capsule-cafe",
+   "name": "India",
+   "range": "Cafés d'origine",
+   "intensity": 11,
+   "aromas": [
+    "Epicé",
+    "Intense",
+    "Boisé"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653744439326/india-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/india-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "indonesia-capsule-cafe",
+   "name": "Indonesia",
+   "range": "Cafés d'origine",
+   "intensity": 8,
+   "aromas": [
+    "Intense",
+    "Boisé"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653745881118/indonesia-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/indonesia-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "kahawa-ya-congo-organic-capsule-cafe",
+   "name": "Kahawa ya Congo Organic",
+   "range": "Cafés d'origine",
+   "intensity": 7,
+   "aromas": [
+    "Équilibré",
+    "Biscuits",
+    "Fruité",
+    "Céréales sucrées"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653939277854/kahawa-ya-congo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/kahawa-ya-congo-organic-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "nicaragua-capsule-cafe",
+   "name": "Nicaragua",
+   "range": "Cafés d'origine",
+   "intensity": 5,
+   "aromas": [
+    "Céréales sucrées"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/48988228911134/Nicaragua-OL.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/nicaragua-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "original-peru-organic",
+   "name": "Peru Organic",
+   "range": "Cafés d'origine",
+   "intensity": 6,
+   "aromas": [
+    "Agrume"
+   ],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/14938066026526/C-0883-plp-image-318px318px.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/original-peru-organic"
+  },
+  {
+   "system": "original",
+   "slug": "buenos-aires-capsule-cafe",
+   "name": "Buenos Aires Lungo",
+   "range": "City Exploration",
+   "intensity": 4,
+   "aromas": [
+    "Céréales",
+    "Caramélisée"
+   ],
+   "cups": [
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653500481566/buenos-aires-lungo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/buenos-aires-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "istanbul-capsule-cafe",
+   "name": "Istanbul Espresso",
+   "range": "City Exploration",
+   "intensity": 8,
+   "aromas": [
+    "Grillé",
+    "Fruité"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/15414727049246/before-PLP-318x318px.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/istanbul-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "parisespresso-coffee-capsule",
+   "name": "Paris Espresso",
+   "range": "City Exploration",
+   "intensity": 6,
+   "aromas": [
+    "Agrume",
+    "Céréales",
+    "Biscuits"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16724971225118/paris-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/parisespresso-coffee-capsule"
+  },
+  {
+   "system": "original",
+   "slug": "riodejaneiro-capsule-cafe",
+   "name": "Rio de Janeiro Espresso",
+   "range": "City Exploration",
+   "intensity": 9,
+   "aromas": [
+    "Epicé",
+    "À base de plantes"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16654101577758/rio-de-janeiro-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/riodejaneiro-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "shanghai-capsule-cafe",
+   "name": "Shanghai Lungo",
+   "range": "City Exploration",
+   "intensity": 5,
+   "aromas": [
+    "Citrique",
+    "Baie"
+   ],
+   "cups": [
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16724973486110/shangai-lungo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/shanghai-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "stockholm-capsule-cafe",
+   "name": "Stockholm Lungo",
+   "range": "City Exploration",
+   "intensity": 8,
+   "aromas": [
+    "Grillé",
+    "Céréales maltées"
+   ],
+   "cups": [
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16724841758750/stockholm-lungo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/stockholm-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "tokyo-capsule-cafe",
+   "name": "Tokyo Lungo",
+   "range": "City Exploration",
+   "intensity": 6,
+   "aromas": [
+    "Floral",
+    "Grillé"
+   ],
+   "cups": [
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16724845232158/tokyo-lungo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/tokyo-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "vienna-capsule-cafe",
+   "name": "Vienna Lungo",
+   "range": "City Exploration",
+   "intensity": 6,
+   "aromas": [
+    "Céréales maltées"
+   ],
+   "cups": [
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16724849066014/vienna-lungo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/vienna-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "arpeggio-decaffeinato-capsule-cafe",
+   "name": "Arpeggio Decaffeinato",
+   "range": "Décaféinés",
+   "intensity": 9,
+   "aromas": [
+    "Cacao",
+    "Intensément grillé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/34682651541534/arpeggio-decaffeinato-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/arpeggio-decaffeinato-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "decaffeinato-cafe-compostable",
+   "name": "Decaffeinato",
+   "range": "Décaféinés",
+   "intensity": 7,
+   "aromas": [
+    "Céréales maltées"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/28286357864478.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/decaffeinato-cafe-compostable"
+  },
+  {
+   "system": "original",
+   "slug": "ristretto-decaffeinato-capsule-cafe",
+   "name": "Ristretto Decaffeinato",
+   "range": "Décaféinés",
+   "intensity": 10,
+   "aromas": [
+    "Notes de fruit",
+    "Intensément grillé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/34682663632926/ristretto-decaffeinato-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/ristretto-decaffeinato-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "vienna-lungo-descaffeinato",
+   "name": "Vienna Lungo Decaffeinato",
+   "range": "Décaféinés",
+   "intensity": 6,
+   "aromas": [
+    "Céréales",
+    "Doux"
+   ],
+   "cups": [
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/33381856575518/vienna-lungo-decaf-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/vienna-lungo-descaffeinato"
+  },
+  {
+   "system": "original",
+   "slug": "volluto-decaffeinato-coffee-capsule",
+   "name": "Volluto Decaffeinato",
+   "range": "Décaféinés",
+   "intensity": 4,
+   "aromas": [
+    "Équilibré",
+    "Céréales",
+    "Fruité"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/51156179255326/Volluto-Decaffeinato-OL-2000x2000.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/volluto-decaffeinato-coffee-capsule"
+  },
+  {
+   "system": "original",
+   "slug": "arpeggio-capsule-cafe",
+   "name": "Arpeggio",
+   "range": "Ispirazione Italiana",
+   "intensity": 9,
+   "aromas": [
+    "Cacao",
+    "Intensément grillé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653366034462/arpeggio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/arpeggio-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "arpeggio-extra-capsule-cafe",
+   "name": "Arpeggio Extra",
+   "range": "Ispirazione Italiana",
+   "intensity": 9,
+   "aromas": [
+    "Cacao",
+    "Intensément grillé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/32347615166494/arpeggio-extra-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/arpeggio-extra-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "capriccio-capsule-cafe",
+   "name": "Capriccio",
+   "range": "Ispirazione Italiana",
+   "intensity": 5,
+   "aromas": [
+    "Céréales"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/14460688269342/capriccio-XL.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/capriccio-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "cosi-capsule-cafe",
+   "name": "Cosi",
+   "range": "Ispirazione Italiana",
+   "intensity": 4,
+   "aromas": [
+    "Fruité",
+    "Céréales"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653731397662/cosi-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/cosi-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "aosta-cafe-compostable",
+   "name": "Ispirazione Aosta",
+   "range": "Ispirazione Italiana",
+   "intensity": 5,
+   "aromas": [
+    "Fruité"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/27735600365598.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/aosta-cafe-compostable"
+  },
+  {
+   "system": "original",
+   "slug": "emilia-cafe-compostable",
+   "name": "Ispirazione Emilia",
+   "range": "Ispirazione Italiana",
+   "intensity": 7,
+   "aromas": [
+    "Caramel",
+    "Céréales grillées"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/27735602954270/C-1081-ResponsivePLPImage.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/emilia-cafe-compostable"
+  },
+  {
+   "system": "original",
+   "slug": "palermo-cafe-compostable",
+   "name": "Ispirazione Palermo",
+   "range": "Ispirazione Italiana",
+   "intensity": 10,
+   "aromas": [
+    "Fruité",
+    "Biscuits"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/31964973826078/C-1079-ResponsivePLPImage.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/palermo-cafe-compostable"
+  },
+  {
+   "system": "original",
+   "slug": "sicilia-cafe-compostable",
+   "name": "Ispirazione Sicilia",
+   "range": "Ispirazione Italiana",
+   "intensity": 8,
+   "aromas": [
+    "Cacao",
+    "Boisé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/27735611342878.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/sicilia-cafe-compostable"
+  },
+  {
+   "system": "original",
+   "slug": "kazaar-capsule-cafe",
+   "name": "Kazaar",
+   "range": "Ispirazione Italiana",
+   "intensity": 12,
+   "aromas": [
+    "Boisé",
+    "Epicé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653942259742/kazaar-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/kazaar-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "livanto-capsule-cafe",
+   "name": "Livanto",
+   "range": "Ispirazione Italiana",
+   "intensity": 6,
+   "aromas": [
+    "Saveur caramel",
+    "Équilibré"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653944487966/livanto-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/livanto-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "napoli-capsule-cafe",
+   "name": "Napoli",
+   "range": "Ispirazione Italiana",
+   "intensity": 13,
+   "aromas": [
+    "Intense",
+    "Grillé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653931806750/ispirazione-napoli-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/napoli-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "ristretto-capsule-cafe",
+   "name": "Ristretto",
+   "range": "Ispirazione Italiana",
+   "intensity": 10,
+   "aromas": [
+    "Intensément grillé",
+    "Notes de fruit"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/50578718752798/Ristretto-Italiano-O-plp-cafe.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/ristretto-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "roma-capsule-cafe",
+   "name": "Roma",
+   "range": "Ispirazione Italiana",
+   "intensity": 8,
+   "aromas": [
+    "Boisé",
+    "Céréales"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653932462110/ispirazione-roma-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/roma-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "venezia-capsule-cafe",
+   "name": "Venezia",
+   "range": "Ispirazione Italiana",
+   "intensity": 8,
+   "aromas": [
+    "Grillé"
+   ],
+   "cups": [
+    "Ristretto",
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653932789790/ispirazione-venezia-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/venezia-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "volluto-capsule-cafe",
+   "name": "Volluto",
+   "range": "Ispirazione Italiana",
+   "intensity": 4,
+   "aromas": [
+    "Équilibré",
+    "Fruité",
+    "Céréales"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/14460689088542/volluto-XL.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/volluto-capsule-cafe"
+  },
+  {
+   "system": "original",
+   "slug": "cafe-joyeux",
+   "name": "Café Joyeux",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": 5,
+   "aromas": [],
+   "cups": [
+    "Espresso",
+    "Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/15906666381342/Cafe-Joyeux-OL-2.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/cafe-joyeux"
+  },
+  {
+   "system": "original",
+   "slug": "original-cafe-florian",
+   "name": "Caffè Florian",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": 9,
+   "aromas": [
+    "Boisé",
+    "Epicé"
+   ],
+   "cups": [
+    "Ristretto"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/35020949356574/C-1299-OL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/original-cafe-florian"
+  },
+  {
+   "system": "original",
+   "slug": "original-coconut-vanilla-flavour-over-ice",
+   "name": "Coconut Vanilla Flavour Over Ice",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Saveur de vanille",
+    "Noix de coco"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/34928975446046/C-1310-OL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/original-coconut-vanilla-flavour-over-ice"
+  },
+  {
+   "system": "original",
+   "slug": "hawaii-kona-coffee-capsule",
+   "name": "Hawaii Kona",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": 5,
+   "aromas": [
+    "Fruité",
+    "Tropical",
+    "Citrique",
+    "Équilibré"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/16653742342174/hawaii-kona-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/hawaii-kona-coffee-capsule"
+  },
+  {
+   "system": "original",
+   "slug": "yuzu-vanilla-over-ice-ol",
+   "name": "Yuzu Vanilla Over Ice",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Soupçon de vanille",
+    "Yuzu"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/47955984711710/C-1388-PLP-320x320.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/original/yuzu-vanilla-over-ice-ol"
+  },
+  {
+   "system": "vertuo",
+   "slug": "bianco-forte-capsules-cafe",
+   "name": "Bianco Forte",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Intense",
+    "Équilibré",
+    "Grillé",
+    "Doux"
+   ],
+   "cups": [
+    "Mug",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17452696895518/C-0290-ResponsivePLPImage.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/bianco-forte-capsules-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "barista-golden-caramel-caspule-cafe",
+   "name": "Golden Caramel",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Saveur caramel",
+    "Biscuits"
+   ],
+   "cups": [
+    "Mug",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/32181925445662/VL-Golden-Caramel-.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/barista-golden-caramel-caspule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "barista-roasted-hazelnut-caspule-cafe",
+   "name": "Roasted Hazelnut",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Noisette",
+    "Noisette et chocolat",
+    "Doux",
+    "Caramélisée",
+    "Biscuits"
+   ],
+   "cups": [
+    "Mug",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/32181921153054/VL-Roasted-Hazelnut-.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/barista-roasted-hazelnut-caspule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "barista-sweet-vanilla-caspule-cafe",
+   "name": "Sweet Vanilla",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Céréales",
+    "Biscuits",
+    "Saveur de vanille"
+   ],
+   "cups": [
+    "Mug",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/32182302736414/VL-Sweet-Vanilla.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/barista-sweet-vanilla-caspule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-sweet-vanilla-decaffeinato",
+   "name": "Sweet Vanilla Decaffeinato",
+   "range": "Barista Creations",
+   "intensity": null,
+   "aromas": [
+    "Saveur de vanille"
+   ],
+   "cups": [
+    "Mug",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/34718154948638/C-1306-VL-Responsive-plp-image.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-sweet-vanilla-decaffeinato"
+  },
+  {
+   "system": "vertuo",
+   "slug": "colombia-vertuo-capsule-cafe",
+   "name": "Colombia",
+   "range": "Café d'origine",
+   "intensity": 5,
+   "aromas": [
+    "Fruits rouges"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17200621879326/colombia-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/colombia-vertuo-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-costa-rica-capsule-cafe",
+   "name": "Costa Rica",
+   "range": "Café d'origine",
+   "intensity": 7,
+   "aromas": [
+    "Céréales maltées"
+   ],
+   "cups": [
+    "Gran Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17200617521182/costa-rica-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-costa-rica-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-master-origins-ethiopia",
+   "name": "Ethiopia",
+   "range": "Café d'origine",
+   "intensity": 4,
+   "aromas": [
+    "Fruité",
+    "Floral"
+   ],
+   "cups": [
+    "Gran Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/28204106940446.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-master-origins-ethiopia"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-kahawa-ya-congo-organic-capsule-cafe",
+   "name": "Kahawa ya Congo Organic",
+   "range": "Café d'origine",
+   "intensity": 6,
+   "aromas": [
+    "Fruité",
+    "Biscuits",
+    "Céréales sucrées"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299760119838/kahawa-ya-congo-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-kahawa-ya-congo-organic-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "mexico-capsule-cafe",
+   "name": "Mexico",
+   "range": "Café d'origine",
+   "intensity": 7,
+   "aromas": [
+    "Epicé",
+    "Boisé"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299416907806/mexico-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/mexico-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "peru-organic-capsule-cafe",
+   "name": "Peru Organic",
+   "range": "Café d'origine",
+   "intensity": 6,
+   "aromas": [
+    "Fruité",
+    "Céréales grillées"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299753009182/peru-organic-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/peru-organic-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "altissio-capsule-cafe",
+   "name": "Altissio",
+   "range": "Cafés signatures",
+   "intensity": 9,
+   "aromas": [
+    "Fruité"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17190297239582/altissio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/altissio-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-altissio-decaffeinato-coffee",
+   "name": "Altissio Decaffeinato",
+   "range": "Cafés signatures",
+   "intensity": 9,
+   "aromas": [
+    "Cacao"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17190297796638/altissio-decaffeinato-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-altissio-decaffeinato-coffee"
+  },
+  {
+   "system": "vertuo",
+   "slug": "arondio-capsule-cafe",
+   "name": "Arondio",
+   "range": "Cafés signatures",
+   "intensity": 6,
+   "aromas": [
+    "Céréales douces"
+   ],
+   "cups": [
+    "Gran Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/32357341233182/ARONDIO-VL.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/arondio-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "diavolitto-capsule-cafe",
+   "name": "Diavolitto",
+   "range": "Cafés signatures",
+   "intensity": 11,
+   "aromas": [
+    "Intense",
+    "Epicé"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17200619192350/diavolitto-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/diavolitto-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "fortado-capsule-cafe-7231-20",
+   "name": "Fortado",
+   "range": "Cafés signatures",
+   "intensity": 8,
+   "aromas": [
+    "Cacao",
+    "Bois de chêne"
+   ],
+   "cups": [
+    "Gran Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17201088299038/fortado-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/fortado-capsule-cafe-7231-20"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-fortado-decaffeinato-coffee-capsule",
+   "name": "Fortado Decaffeinato",
+   "range": "Cafés signatures",
+   "intensity": 8,
+   "aromas": [
+    "Boisé"
+   ],
+   "cups": [
+    "Gran Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17201088626718/fortado-decaffeinato-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-fortado-decaffeinato-coffee-capsule"
+  },
+  {
+   "system": "vertuo",
+   "slug": "half-caffeinato-capsule-cafe",
+   "name": "Half Caffeinato",
+   "range": "Cafés signatures",
+   "intensity": 5,
+   "aromas": [
+    "Doux"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17201092952094/half-caffeinato-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/half-caffeinato-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-il-caffe-capsule-cafe",
+   "name": "Il Caffè",
+   "range": "Cafés signatures",
+   "intensity": 11,
+   "aromas": [
+    "Céréales",
+    "Boisé"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299760513054/il-caffe-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-il-caffe-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "inizio-coffee-capsule",
+   "name": "Inizio",
+   "range": "Cafés signatures",
+   "intensity": 4,
+   "aromas": [
+    "Floral"
+   ],
+   "cups": [
+    "Gran Lungo"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299124846622/inizio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/inizio-coffee-capsule"
+  },
+  {
+   "system": "vertuo",
+   "slug": "intenso-capsule-coffee",
+   "name": "Intenso",
+   "range": "Cafés signatures",
+   "intensity": 9,
+   "aromas": [
+    "Des notes grillées et de sucre brun"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299413729310/intenso-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/intenso-capsule-coffee"
+  },
+  {
+   "system": "vertuo",
+   "slug": "melozio-capsule-cafe",
+   "name": "Melozio",
+   "range": "Cafés signatures",
+   "intensity": 6,
+   "aromas": [
+    "Doux"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299414417438/melozio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/melozio-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "melozio-decaffeinato-coffee-capsule",
+   "name": "Melozio Decaffeinato",
+   "range": "Cafés signatures",
+   "intensity": 6,
+   "aromas": [
+    "Céréales"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/14446712553502/melozio-decaffeinato-XL.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/melozio-decaffeinato-coffee-capsule"
+  },
+  {
+   "system": "vertuo",
+   "slug": "odacio-capsule-cafe",
+   "name": "Odacio",
+   "range": "Cafés signatures",
+   "intensity": 7,
+   "aromas": [
+    "Intense"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299416973342/odacio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/odacio-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "orafio-coffee-pods",
+   "name": "Orafio",
+   "range": "Cafés signatures",
+   "intensity": 6,
+   "aromas": [
+    "Caramel"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299417628702/orafio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/orafio-coffee-pods"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-ristretto-classico",
+   "name": "Ristretto Classico",
+   "range": "Cafés signatures",
+   "intensity": 9,
+   "aromas": [
+    "Baie",
+    "Intensément grillé"
+   ],
+   "cups": [
+    "Ristretto"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/27750724108318/C-1131-ResponsivePLPImage.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-ristretto-classico"
+  },
+  {
+   "system": "vertuo",
+   "slug": "ristretto-intenso-vertuo-708420",
+   "name": "Ristretto Intenso",
+   "range": "Cafés signatures",
+   "intensity": 12,
+   "aromas": [
+    "Epicé",
+    "Boisé"
+   ],
+   "cups": [
+    "Ristretto"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/27750715260958.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/ristretto-intenso-vertuo-708420"
+  },
+  {
+   "system": "vertuo",
+   "slug": "solelio-capsule-cafe",
+   "name": "Solelio",
+   "range": "Cafés signatures",
+   "intensity": 2,
+   "aromas": [
+    "Doux",
+    "Céréales",
+    "Céréale fruitée",
+    "Fruité"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299753697310/solelio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/solelio-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "stormio-capsule-cafe",
+   "name": "Stormio",
+   "range": "Cafés signatures",
+   "intensity": 8,
+   "aromas": [
+    "Intense"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/33724654813214/stormio-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/stormio-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-stormio-go",
+   "name": "Stormio Go",
+   "range": "Cafés signatures",
+   "intensity": 8,
+   "aromas": [
+    "Epicé",
+    "Boisé"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/26646587047966/C-1120-ResponsivePLP-320x320.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-stormio-go"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-toccanto",
+   "name": "Toccanto",
+   "range": "Cafés signatures",
+   "intensity": 5,
+   "aromas": [
+    "Baie"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299757563934/toccanto-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-toccanto"
+  },
+  {
+   "system": "vertuo",
+   "slug": "voltesso-capsule-cafe",
+   "name": "Voltesso",
+   "range": "Cafés signatures",
+   "intensity": 4,
+   "aromas": [
+    "Doux"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299759890462/voltesso-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/voltesso-capsule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-cafe-joyeux",
+   "name": "Café Joyeux",
+   "range": "Collaborations",
+   "intensity": 5,
+   "aromas": [],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/30016166821918/VL-Cafe-Joyeux-2000x2000-hearts.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-cafe-joyeux"
+  },
+  {
+   "system": "vertuo",
+   "slug": "starbucks-blonde-espresso-roast",
+   "name": "Starbucks Blonde® Espresso Roast",
+   "range": "Collaborations",
+   "intensity": 6,
+   "aromas": [
+    "Grillé",
+    "Notes sucrées"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/44807170818078/C-1336-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/starbucks-blonde-espresso-roast"
+  },
+  {
+   "system": "vertuo",
+   "slug": "starbucks-creamy-vanilla",
+   "name": "Starbucks® Creamy Vanilla",
+   "range": "Collaborations",
+   "intensity": 5,
+   "aromas": [
+    "Saveur de vanille",
+    "Biscuits"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/44809858646046/C-1342-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/starbucks-creamy-vanilla"
+  },
+  {
+   "system": "vertuo",
+   "slug": "starbucks-espresso-roast",
+   "name": "Starbucks® Espresso Roast",
+   "range": "Collaborations",
+   "intensity": 11,
+   "aromas": [
+    "Saveur caramel",
+    "Riche"
+   ],
+   "cups": [
+    "Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/31874718531614/espresso-roast-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/starbucks-espresso-roast"
+  },
+  {
+   "system": "vertuo",
+   "slug": "starbucks-pike-place-roast",
+   "name": "Starbucks® Pike Place® Roast",
+   "range": "Collaborations",
+   "intensity": 7,
+   "aromas": [
+    "Cacao",
+    "Epicé"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/44810812358686/C-1338-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/starbucks-pike-place-roast"
+  },
+  {
+   "system": "vertuo",
+   "slug": "starbucks-single-origin-colombia",
+   "name": "Starbucks® Single Origin Colombia",
+   "range": "Collaborations",
+   "intensity": 7,
+   "aromas": [
+    "À base de plantes",
+    "Noyer"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/44809843900446/C-1341-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/starbucks-single-origin-colombia"
+  },
+  {
+   "system": "vertuo",
+   "slug": "starbucks-smooth-caramel",
+   "name": "Starbucks® Smooth Caramel",
+   "range": "Collaborations",
+   "intensity": 5,
+   "aromas": [
+    "Saveur caramel",
+    "Vanille et amande"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/44810236952606/C-1343-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/starbucks-smooth-caramel"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-active",
+   "name": "Active",
+   "range": "Double Espresso",
+   "intensity": null,
+   "aromas": [
+    "Vanille et amande",
+    "Amandes",
+    "Saveur de vanille"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/44646265520158/Stormio-standard.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-active"
+  },
+  {
+   "system": "vertuo",
+   "slug": "barista-bianco-doppio-caspule-cafe",
+   "name": "Bianco Doppio",
+   "range": "Double Espresso",
+   "intensity": null,
+   "aromas": [
+    "Lacté"
+   ],
+   "cups": [
+    "Double Espresso",
+    "Recette"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17190300844062/bianco-doppio-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/barista-bianco-doppio-caspule-cafe"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-chiaro-decaffeinato",
+   "name": "Chiaro Decaffeinato",
+   "range": "Double Espresso",
+   "intensity": 8,
+   "aromas": [
+    "Boisé",
+    "Céréales grillées",
+    "Notes sucrées"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/34710541402142/double-espresso-chiaro-decaffeinato-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-chiaro-decaffeinato"
+  },
+  {
+   "system": "vertuo",
+   "slug": "double-espresso-chiaro-vertuo-coffee-pods",
+   "name": "Double Espresso Chiaro",
+   "range": "Double Espresso",
+   "intensity": 8,
+   "aromas": [
+    "Boisé",
+    "Terreux"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17200613589022/chiaro-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/double-espresso-chiaro-vertuo-coffee-pods"
+  },
+  {
+   "system": "vertuo",
+   "slug": "dolce-capsule-cafe-7085-20",
+   "name": "Double Espresso Dolce",
+   "range": "Double Espresso",
+   "intensity": 5,
+   "aromas": [
+    "Céréales"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17200621944862/dolce-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/dolce-capsule-cafe-7085-20"
+  },
+  {
+   "system": "vertuo",
+   "slug": "scuro-capsule-cafe-7298-20",
+   "name": "Double Espresso Scuro",
+   "range": "Double Espresso",
+   "intensity": 11,
+   "aromas": [
+    "Cacao",
+    "Fumé",
+    "Robusta"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299753631774/scuro-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/scuro-capsule-cafe-7298-20"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-ginseng-delight",
+   "name": "Ginseng Delight",
+   "range": "Double Espresso",
+   "intensity": null,
+   "aromas": [
+    "Ginseng"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/26542905425950/ginseng-delight-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-ginseng-delight"
+  },
+  {
+   "system": "vertuo",
+   "slug": "oatly-barista-edition",
+   "name": "Oatly Barista Edition",
+   "range": "Double Espresso",
+   "intensity": null,
+   "aromas": [
+    "Céréales",
+    "Doux"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/34348435144734/responsive-plp-image.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/oatly-barista-edition"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-coconut-vanilla-flavour-over-ice",
+   "name": "Coconut Vanilla Flavour Over Ice",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Noix de coco",
+    "Soupçon de vanille"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/35044445978654/C-1311-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-coconut-vanilla-flavour-over-ice"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-festive-collection-double-espresso",
+   "name": "Festive Collection Double Espresso",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": 7,
+   "aromas": [
+    "Céréales",
+    "Fruits mûrs"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/46358991929374.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-festive-collection-double-espresso"
+  },
+  {
+   "system": "vertuo",
+   "slug": "french-lavender-vanilla-decaf",
+   "name": "French Lavender and Vanilla Decaffeinato",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Saveur de vanille",
+    "Fruité",
+    "Céréales",
+    "Doux",
+    "Lavande"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/46632640839710/C-1384-VL-Responsive-plp.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/french-lavender-vanilla-decaf"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-hawaii-kona-capsule-cafe-7071-20",
+   "name": "Hawaii Kona",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Fruité",
+    "Tropical",
+    "Citrique",
+    "Équilibré"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/17299761201182/hawaii-kona-2x.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-hawaii-kona-capsule-cafe-7071-20"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-festive-sweet-almond-and-hibiscus",
+   "name": "Sweet Almond & Hibiscus",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Amandes",
+    "Hibiscus"
+   ],
+   "cups": [
+    "Mug"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/45785090129950/C-1354-PLP-320x320.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-festive-sweet-almond-and-hibiscus"
+  },
+  {
+   "system": "vertuo",
+   "slug": "vertuo-tanzania-samra-origins-by-the-weeknd",
+   "name": "Tanzania",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": 5,
+   "aromas": [
+    "Notes de céréales",
+    "Agrume"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/45068283838494/C-1345-PLP-320x320.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/vertuo-tanzania-samra-origins-by-the-weeknd"
+  },
+  {
+   "system": "vertuo",
+   "slug": "yuzu-vanilla-over-ice",
+   "name": "Yuzu Vanilla Over Ice",
+   "range": "Nouveautés & Éditions Limitées",
+   "intensity": null,
+   "aromas": [
+    "Soupçon de vanille",
+    "Yuzu"
+   ],
+   "cups": [
+    "Double Espresso"
+   ],
+   "image": "https://www.nespresso.com/ecom/medias/sys_master/public/47948236488734/C-1387-PLP-320x320.png",
+   "url": "https://www.nespresso.com/fr/fr/order/capsules/vertuo/yuzu-vanilla-over-ice"
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 # Baristina V1
 
-Application web mobile : scanner, catalogue et collection de capsules compatibles **Nespresso Original**
+Application web mobile : scanner, catalogue et collection de capsules **Nespresso Original et Vertuo**, et compatibles Original
 (Nespresso, L'Or, Starbucks, Carte Noire, Lavazza, illy, Segafredo, Kimbo, Caffè Borbone).
 Règle : une marque n'est ajoutée que si son site officiel montre clairement ses capsules.
 
@@ -95,6 +95,7 @@ de rechercher un pseudo. L'e-mail reste privé.
 - **Valider une photo proposée** : Storage → `submissions`. Si elle convient, téléverse-la dans le bucket public
   `capsules`, copie son URL publique dans `products.photo_url` (Table Editor), puis passe la ligne de
   `photo_submissions` en `approved`. Pour qu'elle serve aussi au scan, copie-la dans `photos/` et régénère l'index (étape 3).
+- **Catalogue Nespresso (Original + Vertuo)** : `node scripts/fetch-nespresso.mjs` relève le site Nespresso dans `data/nespresso-catalog.json`, puis `node scripts/build-seed.mjs`.
 - **Mettre à jour le catalogue** : modifie `scripts/build-seed.mjs`, lance `node scripts/build-seed.mjs`, puis exécute
   le nouveau `supabase/seed.sql`. Les capsules retirées sont masquées, pas supprimées (les collections restent intactes).
   Règle : uniquement des informations vérifiées sur le site officiel de la marque ; sinon, laisser vide.

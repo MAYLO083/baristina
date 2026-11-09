@@ -185,8 +185,8 @@ const borbone = [
 // ---------------------------------------------------------------------
 const products = [];
 const add = (p) => products.push({
-  range: null, intensity: null, cup_sizes: [], aromas: [], origin: null, roast: null, highlight: null,
-  decaf: false, flavoured: false, organic: false, limited: false, color: null, photo_url: null, ...p,
+  system: 'original', range: null, intensity: null, cup_sizes: [], aromas: [], origin: null, roast: null, highlight: null,
+  decaf: false, flavoured: false, organic: false, limited: false, color: null, photo_url: null, official_image: null, ...p,
 });
 
 for (const [id, name, range, intensity, cups, aromas, x] of nespresso) {
@@ -195,6 +195,30 @@ for (const [id, name, range, intensity, cups, aromas, x] of nespresso) {
     organic: !!x.organic, limited: !!x.limited, color: x.color ?? null,
     photo_url: x.photo ? `photos/${x.photo}.jpg` : null, shop_url: NES + x.url });
 }
+// Reste du catalogue Nespresso (Original et Vertuo), relevé par scripts/fetch-nespresso.mjs :
+// toutes les capsules qui ne sont pas déjà décrites à la main ci-dessus.
+const NES_FILE = new URL('../data/nespresso-catalog.json', import.meta.url);
+const nesCatalog = existsSync(NES_FILE) ? JSON.parse(readFileSync(NES_FILE, 'utf8')).items : [];
+const handSlugs = new Set(nespresso.map((x) => x[6].url));
+const slugify = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/®/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const CUPS = { original: { Ristretto: R, Espresso: E, Lungo: L, Recette: 'Recette au lait' }, vertuo: { Recette: 'Recette au lait' } };
+const lowerFirst = (t) => (t.charAt(0).toLowerCase() + t.slice(1)).replace(/^epic/, 'épic'); // « Epicé » sans accent sur le site
+for (const x of nesCatalog) {
+  if (x.system === 'original' && handSlugs.has(x.slug)) continue;
+  const starbucks = /^starbucks/i.test(x.name); // collaborations Starbucks vendues par Nespresso
+  const name = starbucks ? x.name.replace(/®/g, '').replace(/^Starbucks\s*/i, '').trim() : x.name;
+  const brand = starbucks ? 'starbucks' : 'nespresso';
+  const aromas = x.aromas.map(lowerFirst);
+  const highlight = [/half caffeinato/i.test(x.name) ? 'Mi-caféiné' : null, /compostable/.test(x.slug) ? 'Capsule compostable' : null,
+    /over ice/i.test(x.name) ? 'Pour boisson glacée' : null].filter(Boolean).join(' · ') || null;
+  add({ id: `${brand}-${x.system === 'vertuo' ? 'vertuo-' : ''}${slugify(name)}`, brand_id: brand, system: x.system, name,
+    range: starbucks ? 'Starbucks by Nespresso' : x.range, intensity: x.intensity,
+    cup_sizes: x.cups.map((c) => CUPS[x.system][c] ?? c), aromas, highlight,
+    decaf: /decaffeinato/i.test(x.name) || x.range === 'Décaféinés', organic: /organic/i.test(x.name),
+    flavoured: /flavour/i.test(x.name) || aromas.some((a) => /saveur|soupçon|noix de coco|yuzu|lavande|hibiscus|ginseng|vanille|amande/.test(a)),
+    official_image: x.image, shop_url: x.url });
+}
+
 for (const [id, name, intensity, cups, x, slug] of lor) {
   add({ id: 'lor-' + id, brand_id: 'lor', name, range: x.flavoured ? 'Aromatisés' : 'Capsules classiques', intensity,
     cup_sizes: cups, aromas: x.aromas ?? [], origin: x.origin ?? null, highlight: x.highlight ?? null,
@@ -234,7 +258,7 @@ for (const [id, name, aromas, x, handle] of borbone) {
 const OFFICIAL = existsSync(new URL('../data/official-images.json', import.meta.url))
   ? JSON.parse(readFileSync(new URL('../data/official-images.json', import.meta.url), 'utf8').replace(/^﻿/, '')) : {};
 for (const p of products) {
-  p.official_image = OFFICIAL[p.id] ?? null;
+  p.official_image = OFFICIAL[p.id] ?? p.official_image;
   if (!p.photo_url && p.official_image) p.photo_url = p.official_image;
 }
 
@@ -268,9 +292,9 @@ for (const br of BRANDS) {
 sql += `\n-- Les références retirées des sites ne sont pas supprimées (collections existantes) : elles sont masquées.\n`;
 sql += `update public.products set active = false where id not in (${products.map((p) => q(p.id)).join(', ')});\n\n`;
 for (const p of products) {
-  sql += `insert into public.products (id, brand_id, name, range, intensity, cup_sizes, aromas, origin, roast, highlight, decaf, flavoured, organic, limited, color, photo_url, shop_url, verified_on, active)
-values (${q(p.id)}, ${q(p.brand_id)}, ${q(p.name)}, ${q(p.range)}, ${p.intensity ?? 'null'}, ${arr(p.cup_sizes)}, ${arr(p.aromas)}, ${q(p.origin)}, ${q(p.roast)}, ${q(p.highlight)}, ${b(p.decaf)}, ${b(p.flavoured)}, ${b(p.organic)}, ${b(p.limited)}, ${q(p.color)}, ${q(p.photo_url)}, ${q(p.shop_url)}, '${VERIFIED}', true)
-on conflict (id) do update set brand_id = excluded.brand_id, name = excluded.name, range = excluded.range, intensity = excluded.intensity, cup_sizes = excluded.cup_sizes, aromas = excluded.aromas, origin = excluded.origin, roast = excluded.roast, highlight = excluded.highlight, decaf = excluded.decaf, flavoured = excluded.flavoured, organic = excluded.organic, limited = excluded.limited, color = excluded.color, photo_url = coalesce(public.products.photo_url, excluded.photo_url), shop_url = excluded.shop_url, verified_on = excluded.verified_on, active = true;\n`;
+  sql += `insert into public.products (id, brand_id, system, name, range, intensity, cup_sizes, aromas, origin, roast, highlight, decaf, flavoured, organic, limited, color, photo_url, shop_url, verified_on, active)
+values (${q(p.id)}, ${q(p.brand_id)}, ${q(p.system)}, ${q(p.name)}, ${q(p.range)}, ${p.intensity ?? 'null'}, ${arr(p.cup_sizes)}, ${arr(p.aromas)}, ${q(p.origin)}, ${q(p.roast)}, ${q(p.highlight)}, ${b(p.decaf)}, ${b(p.flavoured)}, ${b(p.organic)}, ${b(p.limited)}, ${q(p.color)}, ${q(p.photo_url)}, ${q(p.shop_url)}, '${VERIFIED}', true)
+on conflict (id) do update set brand_id = excluded.brand_id, system = excluded.system, name = excluded.name, range = excluded.range, intensity = excluded.intensity, cup_sizes = excluded.cup_sizes, aromas = excluded.aromas, origin = excluded.origin, roast = excluded.roast, highlight = excluded.highlight, decaf = excluded.decaf, flavoured = excluded.flavoured, organic = excluded.organic, limited = excluded.limited, color = excluded.color, photo_url = coalesce(public.products.photo_url, excluded.photo_url), shop_url = excluded.shop_url, verified_on = excluded.verified_on, active = true;\n`;
 }
 sql += 'commit;\n';
 

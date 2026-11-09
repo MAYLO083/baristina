@@ -23,7 +23,7 @@ const S = {
   screen: 'home', authTab: 'login', catalogScroll: 0,
   filters: null,
 };
-const defaultFilters = () => ({ q: '', brand: 'all', range: 'all', min: 1, max: 13, sort: 'name',
+const defaultFilters = () => ({ q: '', system: 'all', brand: 'all', range: 'all', min: 1, max: 13, sort: 'name',
   decaf: false, flavoured: false, organic: false, limited: false, owned: false });
 S.filters = defaultFilters();
 
@@ -83,12 +83,14 @@ document.addEventListener('error', (e) => {
 
 // ---------------------------------------------------------------- textes des fiches
 // Rédigés uniquement à partir des faits enregistrés : rien n'est inventé.
+const SYSTEM_NAME = { original: 'Nespresso Original', vertuo: 'Nespresso Vertuo' };
 const ROAST = { blonde: 'blonde (légère)', medium: 'ambrée (moyenne)', dark: 'brune (foncée)' };
 function intensityWord(i) { return i <= 4 ? 'doux' : i <= 7 ? 'équilibré' : i <= 10 ? 'intense' : 'très intense'; }
 function describe(p) {
   const out = [];
   const range = p.range && !/^capsules/i.test(p.range) ? ` de la gamme ${p.range}` : '';
-  out.push(`${p.name} est une capsule ${brandName(p)}${range}, au format Nespresso Original.`);
+  out.push(`${p.name} est une capsule ${brandName(p)}${range}, au format ${SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original}.`);
+  if (p.system === 'vertuo') out.push('Elle ne fonctionne qu’avec les machines Nespresso Vertuo.');
   if (p.intensity) out.push(`Son intensité est de ${p.intensity} sur 13 selon la marque : c’est un café ${intensityWord(p.intensity)}.`);
   if (p.roast) out.push(`Sa torréfaction est ${ROAST[p.roast]}.`);
   if (p.aromas?.length) out.push(`${p.flavoured ? 'Saveur annoncée' : 'Profil aromatique'} : ${joinFr(p.aromas)}.`);
@@ -176,13 +178,14 @@ window.addEventListener('hashchange', route);
 function filtered() {
   const f = S.filters, words = norm(f.q).split(' ').filter(Boolean);
   const out = S.products.filter((p) => {
+    if (f.system !== 'all' && p.system !== f.system) return false;
     if (f.brand !== 'all' && p.brand_id !== f.brand) return false;
     if (f.range !== 'all' && p.range !== f.range) return false;
     if ((f.min > 1 || f.max < 13) && (!p.intensity || p.intensity < f.min || p.intensity > f.max)) return false;
     for (const k of ['decaf', 'flavoured', 'organic', 'limited']) if (f[k] && !p[k]) return false;
     if (f.owned && !S.collection.has(p.id)) return false;
     if (!words.length) return true;
-    const hay = norm([p.name, brandName(p), p.range, p.origin, p.highlight, ...(p.aromas ?? [])].join(' '));
+    const hay = norm([p.name, brandName(p), p.range, p.origin, p.highlight, p.system, ...(p.aromas ?? [])].join(' '));
     return words.every((w) => hay.includes(w));
   });
   const byName = (a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' });
@@ -192,14 +195,15 @@ function filtered() {
 }
 function cardHTML(p) {
   const item = S.collection.get(p.id);
-  const tags = [p.intensity ? `Intensité ${p.intensity}` : null, p.decaf ? 'Déca' : null, p.flavoured ? 'Aromatisé' : null, p.organic ? 'Bio' : null, p.limited ? 'Édition limitée' : null].filter(Boolean);
+  const tags = [p.system === 'vertuo' ? 'Vertuo' : null, p.intensity ? `Intensité ${p.intensity}` : null, p.decaf ? 'Déca' : null, p.flavoured ? 'Aromatisé' : null, p.organic ? 'Bio' : null, p.limited ? 'Édition limitée' : null].filter(Boolean);
   return `<a class="card" href="#/capsule/${encodeURIComponent(p.id)}">${capsuleHTML(p)}<div class="meta"><strong>${esc(p.name)}</strong><span class="sub">${esc(brandName(p))}${tags.length ? ' · ' + esc(tags.join(' · ')) : ''}</span></div>${item ? `<span class="qty">×${item.quantity}</span>` : ''}</a>`;
 }
 function renderFilterControls() {
   const f = S.filters;
   $('brand-chips').innerHTML = [['all', 'Toutes les marques'], ...[...S.brands.values()].map((b) => [b.id, b.name])]
     .map(([id, n]) => `<button class="chip${f.brand === id ? ' on' : ''}" data-brand="${esc(id)}">${esc(n)}</button>`).join('');
-  const ranges = [...new Set(S.products.filter((p) => f.brand === 'all' || p.brand_id === f.brand).map((p) => p.range).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+  document.querySelectorAll('[data-system]').forEach((b) => b.classList.toggle('on', b.dataset.system === f.system));
+  const ranges = [...new Set(S.products.filter((p) => (f.brand === 'all' || p.brand_id === f.brand) && (f.system === 'all' || p.system === f.system)).map((p) => p.range).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
   if (f.range !== 'all' && !ranges.includes(f.range)) f.range = 'all';
   $('f-range').innerHTML = `<option value="all">Toutes</option>` + ranges.map((r) => `<option${r === f.range ? ' selected' : ''}>${esc(r)}</option>`).join('');
   const opts = (sel) => Array.from({ length: 13 }, (_, i) => `<option value="${i + 1}"${i + 1 === sel ? ' selected' : ''}>${i + 1}</option>`).join('');
@@ -221,10 +225,12 @@ function renderCatalog() {
     if (!items.length) continue;
     html += `<h3 class="group-title">${esc(brand.name)} <small>· ${items.length}</small></h3>`;
     if (S.filters.sort === 'name') {
-      const ranges = [...new Set(items.map((p) => p.range ?? 'Autres'))].sort((a, b) => a.localeCompare(b, 'fr'));
+      // Groupes par gamme ; chez Nespresso, les gammes Vertuo sont repérées (« Vertuo · Barista Creations »).
+      const key = (p) => (p.system === 'vertuo' ? 'Vertuo · ' : '') + (p.range ?? 'Autres');
+      const ranges = [...new Set(items.map(key))].sort((a, b) => a.startsWith('Vertuo') - b.startsWith('Vertuo') || a.localeCompare(b, 'fr'));
       for (const r of ranges) {
         if (ranges.length > 1) html += `<div class="range-title">${esc(r)}</div>`;
-        html += items.filter((p) => (p.range ?? 'Autres') === r).map(cardHTML).join('');
+        html += items.filter((p) => key(p) === r).map(cardHTML).join('');
       }
     } else html += items.map(cardHTML).join('');
   }
@@ -248,11 +254,11 @@ function renderDetail() {
   if (!p) { box.innerHTML = '<div class="empty">Cette capsule est introuvable.</div>'; return; }
   let dots = '';
   if (p.intensity) for (let i = 1; i <= 13; i++) dots += `<span class="dot${i > p.intensity ? ' off' : ''}"></span>`;
-  const badges = [p.intensity ? `<span class="badge purple">Intensité ${p.intensity}/13</span>` : '',
+  const badges = [`<span class="badge">${esc(SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original)}</span>`, p.intensity ? `<span class="badge purple">Intensité ${p.intensity}/13</span>` : '',
     p.decaf ? '<span class="badge">Décaféiné</span>' : '', p.flavoured ? '<span class="badge">Aromatisé</span>' : '',
     p.organic ? '<span class="badge">Bio</span>' : '', p.limited ? '<span class="badge">Édition limitée</span>' : ''].join('');
   const facts = [
-    ['Marque', brandName(p)], ['Gamme', p.range], ['Intensité', p.intensity ? `${p.intensity} / 13` : null],
+    ['Marque', brandName(p)], ['Format', SYSTEM_NAME[p.system] ?? SYSTEM_NAME.original], ['Gamme', p.range], ['Intensité', p.intensity ? `${p.intensity} / 13` : null],
     ['Torréfaction', p.roast ? ROAST[p.roast] : null], ['Arômes', p.aromas?.length ? joinFr(p.aromas) : null],
     ['Origine', p.origin], ['Tasse', p.cup_sizes?.length ? p.cup_sizes.join(' · ') : null], ['Particularité', p.highlight],
   ].filter(([, v]) => v).map(([k, v]) => `<div class="fact"><small>${esc(k)}</small><span>${esc(v)}</span></div>`).join('');
@@ -565,6 +571,8 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- actions (délégation : pas de JS inline)
 document.addEventListener('click', async (e) => {
+  const sysTab = e.target.closest('[data-system]');
+  if (sysTab) { S.filters.system = sysTab.dataset.system; renderCatalog(); return; }
   const brandChip = e.target.closest('[data-brand]');
   if (brandChip) { S.filters.brand = brandChip.dataset.brand; renderCatalog(); return; }
   const toggle = e.target.closest('[data-toggle]');

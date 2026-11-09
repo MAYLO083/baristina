@@ -67,6 +67,7 @@ a.btn { display: block; text-align: center; text-decoration: none; }
 .sep::before, .sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; margin-bottom: 8px; background: var(--cream); border-radius: 13px; }
 .tabs button { padding: 10px; border: 0; border-radius: 10px; background: none; font-weight: 600; color: var(--muted); }
+.tabs.three { grid-template-columns: repeat(3, 1fr); margin: 10px 0 0; }
 .tabs button.on { background: var(--white); color: var(--ink); box-shadow: 0 1px 4px #0001; }
 .link-btn { display: block; margin: 12px auto 0; border: 0; background: none; color: var(--green); text-decoration: underline; font-size: 13px; }
 

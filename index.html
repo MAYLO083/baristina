@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#173a23">
-  <meta name="description" content="Baristina — scanner, catalogue et collection de capsules de café compatibles Nespresso Original.">
+  <meta name="description" content="Baristina — scanner, catalogue et collection de capsules de café Nespresso Original, Vertuo et compatibles.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://www.nespresso.com https://www.lorespresso.com https://www.starbucksathome.com https://www.cartenoire.fr https://www.lavazza.fr https://www.illy.com https://www.segafredo.fr https://cdn.shopify.com; connect-src 'self' data: blob: https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co; media-src 'self' blob:; base-uri 'self'; form-action 'self'">
   <title>Baristina</title>
   <link rel="icon" type="image/png" href="apple-touch-icon.png">
@@ -31,6 +31,9 @@
     <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Catalogue</h2><button class="icon-btn" data-action="toggle-filters" aria-label="Filtres">⚙</button></header>
     <div class="content">
       <input id="q" class="search" type="search" placeholder="Rechercher une capsule, une marque, un arôme…" autocomplete="off">
+      <div class="tabs three" id="system-tabs">
+        <button data-system="all">Tous</button><button data-system="original">Original</button><button data-system="vertuo">Vertuo</button>
+      </div>
       <div id="brand-chips" class="chips"></div>
       <div id="filters-panel" class="filters-panel" hidden>
         <div class="row2">

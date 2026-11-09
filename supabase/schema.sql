@@ -121,10 +121,12 @@ create table if not exists public.products (
   color           text check (color ~ '^#[0-9a-fA-F]{6}$'),
   photo_url       text,
   shop_url        text not null,
+  system          text not null default 'original' check (system in ('original', 'vertuo')), -- format de capsule Nespresso
   verified_on     date,
   active          boolean not null default true
 );
 create index if not exists products_brand_idx on public.products (brand_id);
+alter table public.products add column if not exists system text not null default 'original' check (system in ('original', 'vertuo'));
 
 alter table public.brands   enable row level security;
 alter table public.products enable row level security;
