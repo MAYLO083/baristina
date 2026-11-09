@@ -136,10 +136,6 @@ a.btn { display: block; text-align: center; text-decoration: none; }
 /* Scanner */
 .scanner { position: relative; overflow: hidden; border-radius: 16px; background: #111; aspect-ratio: 1 / 1; }
 .scanner video, .scanner img { width: 100%; height: 100%; object-fit: cover; }
-.camera-choice { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 24px; text-align: center; color: #f5ead4; }
-.camera-choice .btn { width: auto; padding: 14px 22px; }
-.camera-choice p { margin: 4px 0 0; font-size: 13px; line-height: 1.4; opacity: .85; }
-.camera-choice .link-btn { color: #f5ead4; }
 .scanner .frame { position: absolute; inset: 12%; border: 2px solid #f5ead4; border-radius: 18px; box-shadow: 0 0 0 999px #0004; pointer-events: none; }
 .scan-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 12px; }
 .shutter { width: 64px; height: 64px; border: 5px solid var(--green); border-radius: 50%; background: var(--white); }
