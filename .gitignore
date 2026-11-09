@@ -2,3 +2,4 @@
 
 supabase/.temp/
 scripts/.cache/
+.claude/

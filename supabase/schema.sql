@@ -15,6 +15,12 @@ create table if not exists public.profiles (
               check (username ~ '^[A-Za-z0-9_.-]{3,20}$'),
   created_at  timestamptz not null default now()
 );
+-- Profil public : biographie et photo (stockée dans le bucket « avatars », dossier = id du compte).
+alter table public.profiles add column if not exists bio text check (char_length(bio) <= 300);
+alter table public.profiles add column if not exists avatar_path text;
+alter table public.profiles drop constraint if exists profiles_avatar_path_check;
+alter table public.profiles add constraint profiles_avatar_path_check
+  check (avatar_path is null or (avatar_path like id::text || '/%' and avatar_path ~ '^[0-9a-f-]{36}/[A-Za-z0-9_.-]{1,60}$'));
 alter table public.profiles enable row level security;
 
 drop policy if exists "Pseudos visibles" on public.profiles;
@@ -23,7 +29,7 @@ create policy "Pseudos visibles" on public.profiles
 
 drop policy if exists "Profil modifiable par son propriétaire" on public.profiles;
 create policy "Profil modifiable par son propriétaire" on public.profiles
-  for update using (auth.uid() = id) with check (auth.uid() = id);
+  for update to authenticated using (auth.uid() = id) with check (auth.uid() = id);
 
 -- Vérification de disponibilité d'un pseudo (appelée pendant la saisie).
 create or replace function public.username_available(p_username text)
@@ -107,7 +113,7 @@ drop policy if exists "Produits actifs visibles" on public.products;
 create policy "Produits actifs visibles" on public.products for select using (active);
 
 -- ---------------------------------------------------------------------
--- Collection personnelle (chaque utilisateur ne voit que la sienne)
+-- Collection : publique (visible sur le profil), modifiable seulement par son propriétaire
 -- ---------------------------------------------------------------------
 create table if not exists public.collection_items (
   user_id     uuid not null default auth.uid() references auth.users (id) on delete cascade,
@@ -121,8 +127,17 @@ create table if not exists public.collection_items (
 alter table public.collection_items enable row level security;
 
 drop policy if exists "Ma collection" on public.collection_items;
-create policy "Ma collection" on public.collection_items
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "Collections publiques" on public.collection_items;
+create policy "Collections publiques" on public.collection_items for select using (true);
+drop policy if exists "Ajouter à ma collection" on public.collection_items;
+create policy "Ajouter à ma collection" on public.collection_items
+  for insert to authenticated with check (auth.uid() = user_id);
+drop policy if exists "Modifier ma collection" on public.collection_items;
+create policy "Modifier ma collection" on public.collection_items
+  for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "Retirer de ma collection" on public.collection_items;
+create policy "Retirer de ma collection" on public.collection_items
+  for delete to authenticated using (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------
 -- Photos proposées par la communauté (validées à la main)
@@ -151,10 +166,25 @@ create policy "Voir mes envois" on public.photo_submissions
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values
   ('submissions', 'submissions', false, 3145728, array['image/jpeg', 'image/png', 'image/webp']),
-  ('capsules',    'capsules',    true,  3145728, array['image/jpeg', 'image/png', 'image/webp'])
+  ('capsules',    'capsules',    true,  3145728, array['image/jpeg', 'image/png', 'image/webp']),
+  ('avatars',     'avatars',     true,  1048576, array['image/jpeg'])
 on conflict (id) do nothing;
 
 drop policy if exists "Envoi dans mon dossier" on storage.objects;
 create policy "Envoi dans mon dossier" on storage.objects
   for insert to authenticated
   with check (bucket_id = 'submissions' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Photos de profil : publiques en lecture, chacun ne gère que son dossier.
+drop policy if exists "Avatar : voir le mien" on storage.objects;
+create policy "Avatar : voir le mien" on storage.objects
+  for select to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "Avatar : envoyer" on storage.objects;
+create policy "Avatar : envoyer" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "Avatar : supprimer" on storage.objects;
+create policy "Avatar : supprimer" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);

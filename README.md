@@ -78,7 +78,18 @@ d'une même marque, c'est la lecture du nom qui tranche — d'où l'intérêt de
 2. **Settings → Pages** → *Deploy from a branch* → `main` / `(root)`.
 3. Mets l'adresse obtenue dans Supabase (étape 2).
 
-## 5. Gérer le contenu
+## 5. Profils publics
+
+Chaque membre a un profil public (`#/profil/<pseudo>`) : photo, biographie (300 caractères max.), date d'inscription,
+statistiques, coups de cœur et collection complète avec étoiles et notes de dégustation. L'onglet **Membres** permet
+de rechercher un pseudo. L'e-mail reste privé.
+- Photos de profil : bucket public `avatars`, une photo carrée de 320 px par membre, dans le dossier `<id du compte>/`.
+- Sécurité (`supabase/schema.sql`) : tout le monde peut lire profils et collections ; seul le propriétaire, connecté,
+  peut modifier son profil, sa collection et sa photo.
+- Modération : pour retirer une photo ou une biographie inappropriée, mets `avatar_path` ou `bio` à vide dans
+  Table Editor → `profiles` (et supprime le fichier dans Storage → `avatars`).
+
+## 6. Gérer le contenu
 
 - **Valider une photo proposée** : Storage → `submissions`. Si elle convient, téléverse-la dans le bucket public
   `capsules`, copie son URL publique dans `products.photo_url` (Table Editor), puis passe la ligne de

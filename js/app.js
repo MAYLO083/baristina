@@ -97,6 +97,15 @@ function describe(p) {
   return out.join(' ');
 }
 
+// ---------------------------------------------------------------- profils publics : photo
+const PROFILE_FIELDS = 'id, username, bio, avatar_path, created_at';
+const avatarURL = (pr) => pr?.avatar_path ? sb.storage.from('avatars').getPublicUrl(pr.avatar_path).data.publicUrl : null;
+function avatarHTML(pr, big = false) {
+  const url = avatarURL(pr);
+  return `<span class="avatar${big ? ' big' : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : esc(String(pr?.username ?? '?').charAt(0))}</span>`;
+}
+const profileLink = (username) => '#/profil/' + encodeURIComponent(username);
+
 // ---------------------------------------------------------------- données
 async function loadCatalog() {
   const [b, p] = await Promise.all([
@@ -112,20 +121,21 @@ async function loadCatalog() {
 async function loadUserData() {
   if (!S.user) { S.profile = null; S.collection = new Map(); return; }
   const [pr, col] = await Promise.all([
-    sb.from('profiles').select('id, username').eq('id', S.user.id).maybeSingle(),
-    sb.from('collection_items').select('*'),
+    sb.from('profiles').select(PROFILE_FIELDS).eq('id', S.user.id).maybeSingle(),
+    sb.from('collection_items').select('*').eq('user_id', S.user.id), // les collections sont publiques : ne charger que la mienne
   ]);
   S.profile = pr.data ?? null;
   S.collection = new Map((col.data ?? []).map((x) => [x.product_id, x]));
 }
 
 // ---------------------------------------------------------------- navigation
-const ROUTES = { '': 'home', catalogue: 'catalog', scanner: 'scan', collection: 'collection', compte: 'account' };
-const SCREENS = { home: 'screen-home', catalog: 'screen-catalog', detail: 'screen-detail', scan: 'screen-scan', collection: 'screen-collection', account: 'screen-account' };
+const ROUTES = { '': 'home', catalogue: 'catalog', scanner: 'scan', collection: 'collection', compte: 'account', membres: 'members' };
+const SCREENS = { home: 'screen-home', catalog: 'screen-catalog', detail: 'screen-detail', scan: 'screen-scan', collection: 'screen-collection', account: 'screen-account', members: 'screen-members', profile: 'screen-profile' };
 let detailId = null;
 function route() {
   const [a, b] = location.hash.replace(/^#\/?/, '').split('/');
   if (a === 'capsule' && b) { detailId = decodeURIComponent(b); show('detail'); return; }
+  if (a === 'profil' && b) { openProfile(decodeURIComponent(b)); show('profile'); return; }
   show(ROUTES[a] ?? 'home');
 }
 function show(name) {
@@ -141,7 +151,7 @@ function show(name) {
 }
 function render() {
   $('home-account-label').textContent = S.profile?.username ? `Mon compte · ${S.profile.username}` : (S.user ? 'Mon compte' : 'Se connecter');
-  ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount })[S.screen]?.();
+  ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile })[S.screen]?.();
 }
 window.addEventListener('hashchange', route);
 
@@ -283,10 +293,82 @@ function renderCollection() {
   if (!items.length) { box.innerHTML = '<div class="empty">Ta collection est vide.<br>Ajoute des capsules depuis le catalogue ou le scanner.</div><a class="btn" href="#/catalogue">Parcourir le catalogue</a>'; return; }
   const total = items.reduce((s, x) => s + x.i.quantity, 0);
   const brands = new Set(items.map((x) => x.p.brand_id)).size;
-  let html = `<div class="stats"><div class="stat"><b>${items.length}</b><span>références</span></div><div class="stat"><b>${total}</b><span>capsules</span></div><div class="stat"><b>${brands}</b><span>marque${brands > 1 ? 's' : ''}</span></div></div>`;
+  let html = (S.profile?.username ? `<a class="btn secondary" href="${profileLink(S.profile.username)}">Voir mon profil public</a>` : '') + `<div class="stats"><div class="stat"><b>${items.length}</b><span>références</span></div><div class="stat"><b>${total}</b><span>capsules</span></div><div class="stat"><b>${brands}</b><span>marque${brands > 1 ? 's' : ''}</span></div></div>`;
   for (const brand of S.brands.values()) {
     const list = items.filter((x) => x.p.brand_id === brand.id).sort((a, b) => a.p.name.localeCompare(b.p.name, 'fr'));
     if (list.length) html += `<h3 class="group-title">${esc(brand.name)}</h3>` + list.map((x) => cardHTML(x.p)).join('');
+  }
+  box.innerHTML = html;
+}
+
+// ---------------------------------------------------------------- membres (recherche de profils)
+const M = { q: null, list: null, seq: 0 };
+let memberTimer;
+async function searchMembers(q) {
+  const seq = ++M.seq;
+  let req = sb.from('profiles').select(PROFILE_FIELDS).not('username', 'is', null).limit(30);
+  // Sans recherche : les derniers inscrits. Les caractères spéciaux de LIKE sont neutralisés.
+  req = q ? req.ilike('username', `%${q.replace(/[\\%_]/g, (c) => '\\' + c)}%`).order('username') : req.order('created_at', { ascending: false });
+  const { data, error } = await req;
+  if (seq !== M.seq) return; // une recherche plus récente est en cours
+  M.q = q; M.list = error ? 'error' : data;
+  if (S.screen === 'members') renderMembers();
+}
+function renderMembers() {
+  const box = $('members-list');
+  if (!CONFIGURED) { box.innerHTML = setupNotice(); return; }
+  const q = $('member-q').value.trim();
+  if (M.q !== q) { if (M.list === null) box.innerHTML = '<div class="loading">Chargement…</div>'; searchMembers(q); return; }
+  if (M.list === 'error') { box.innerHTML = '<div class="notice">Recherche impossible pour le moment. Vérifie ta connexion.</div>'; return; }
+  if (!M.list.length) { box.innerHTML = `<div class="empty">Aucun membre ne correspond à « ${esc(q)} ».</div>`; return; }
+  box.innerHTML = (q ? '' : '<p class="result-count">Derniers inscrits</p>') + M.list.map((pr) =>
+    `<a class="member" href="${profileLink(pr.username)}">${avatarHTML(pr)}<div class="meta"><strong>${esc(pr.username)}</strong><span class="sub">${esc(pr.bio || 'Membre depuis ' + monthYear(pr.created_at))}</span></div><span class="arr">›</span></a>`).join('');
+}
+$('member-q').addEventListener('input', () => { clearTimeout(memberTimer); memberTimer = setTimeout(renderMembers, 300); });
+const monthYear = (d) => new Date(d).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+// ---------------------------------------------------------------- profil public
+const P = { username: null, profile: null, items: null, error: false, seq: 0 };
+async function openProfile(username) {
+  if (P.username?.toLowerCase() === username.toLowerCase() && P.profile && !P.error) { loadProfileItems(); return; }
+  Object.assign(P, { username, profile: null, items: null, error: false });
+  const seq = ++P.seq;
+  if (!CONFIGURED) return;
+  const { data, error } = await sb.from('profiles').select(PROFILE_FIELDS).eq('username', username).maybeSingle();
+  if (seq !== P.seq) return;
+  P.profile = data ?? null; P.error = !!error || !data;
+  if (data) await loadProfileItems(seq); else if (S.screen === 'profile') renderProfile();
+}
+async function loadProfileItems(seq = P.seq) {
+  const { data, error } = await sb.from('collection_items').select('product_id, quantity, rating, note, updated_at').eq('user_id', P.profile.id);
+  if (seq !== P.seq) return;
+  P.items = error ? [] : data;
+  if (S.screen === 'profile') renderProfile();
+}
+const miniStars = (r) => `<span class="mini-stars" aria-label="${r} sur 5">${'★'.repeat(r)}<span class="off">${'★'.repeat(5 - r)}</span></span>`;
+function ratedCardHTML(i, p) {
+  return `<a class="card rated" href="#/capsule/${encodeURIComponent(p.id)}">${capsuleHTML(p)}<div class="meta"><strong>${esc(p.name)}</strong><span class="sub">${esc(brandName(p))}${p.intensity ? ' · Intensité ' + p.intensity : ''}</span>${i.rating ? miniStars(i.rating) : ''}</div><span class="qty">×${i.quantity}</span>${i.note ? `<p class="tasting">« ${esc(i.note)} »</p>` : ''}</a>`;
+}
+function renderProfile() {
+  const box = $('profile-content');
+  if (!CONFIGURED) { box.innerHTML = setupNotice(); return; }
+  if (P.error) { box.innerHTML = `<div class="empty">Le membre « ${esc(P.username)} » est introuvable.</div><a class="btn secondary" href="#/membres">Rechercher un membre</a>`; return; }
+  if (!P.profile || !P.items || !S.loaded) { box.innerHTML = '<div class="loading">Chargement du profil…</div>'; return; }
+  const pr = P.profile, mine = S.user?.id === pr.id;
+  const items = P.items.map((i) => ({ i, p: S.byId.get(i.product_id) })).filter((x) => x.p);
+  const rated = items.filter((x) => x.i.rating);
+  const avg = rated.length ? (rated.reduce((s, x) => s + x.i.rating, 0) / rated.length).toFixed(1).replace('.', ',') : '–';
+  const brands = new Set(items.map((x) => x.p.brand_id)).size;
+  let html = `<div class="profile-head">${avatarHTML(pr, true)}<h1>${esc(pr.username)}</h1><div class="since">Membre depuis ${esc(monthYear(pr.created_at))}</div>
+    ${pr.bio ? `<p class="bio">${esc(pr.bio)}</p>` : ''}</div>
+    ${mine ? '<a class="btn secondary" href="#/compte">Modifier mon profil</a>' : ''}
+    <div class="stats four"><div class="stat"><b>${items.length}</b><span>références</span></div><div class="stat"><b>${items.reduce((s, x) => s + x.i.quantity, 0)}</b><span>capsules</span></div><div class="stat"><b>${brands}</b><span>marque${brands > 1 ? 's' : ''}</span></div><div class="stat"><b>${avg}</b><span>note moy.</span></div></div>`;
+  if (!items.length) { box.innerHTML = html + `<div class="empty">${mine ? 'Ta collection est vide pour l’instant.' : 'Sa collection est vide pour l’instant.'}</div>`; return; }
+  const favs = rated.filter((x) => x.i.rating >= 4).sort((a, b) => b.i.rating - a.i.rating || a.p.name.localeCompare(b.p.name, 'fr')).slice(0, 5);
+  if (favs.length && items.length > 5) html += `<h3 class="group-title">Coups de cœur</h3>` + favs.map((x) => ratedCardHTML(x.i, x.p)).join('');
+  for (const brand of S.brands.values()) {
+    const list = items.filter((x) => x.p.brand_id === brand.id).sort((a, b) => a.p.name.localeCompare(b.p.name, 'fr'));
+    if (list.length) html += `<h3 class="group-title">${esc(brand.name)} <small>· ${list.length}</small></h3>` + list.map((x) => ratedCardHTML(x.i, x.p)).join('');
   }
   box.innerHTML = html;
 }
@@ -324,7 +406,7 @@ function renderAccount() {
         <label class="lbl" for="sp">Mot de passe (8 caractères minimum)</label><input id="sp" class="field" type="password" required minlength="8" autocomplete="new-password">
         <button class="btn">Créer mon compte</button>
       </form>`}
-      <p class="disclaimer">En créant un compte, tu acceptes que ton pseudo, ton e-mail et ta collection soient enregistrés pour faire fonctionner l’app. Tu peux supprimer ton compte à tout moment.</p>`;
+      <p class="disclaimer">Les profils sont publics : ton pseudo, ta photo, ta biographie et ta collection (avec tes notes) seront visibles par tous. Ton e-mail reste privé. Tu peux supprimer ton compte à tout moment.</p>`;
     return;
   }
   if (!S.profile?.username) {
@@ -335,7 +417,15 @@ function renderAccount() {
     return;
   }
   box.innerHTML = `
-    <div class="box flush"><h3>${esc(S.profile.username)}</h3><p class="hint">${esc(S.user.email ?? '')}</p></div>
+    <div class="box flush avatar-edit">${avatarHTML(S.profile, true)}<div class="actions"><h3>${esc(S.profile.username)}</h3><p class="hint">${esc(S.user.email ?? '')}</p>
+      <label class="btn secondary file-btn">${S.profile.avatar_path ? 'Changer de photo' : 'Ajouter une photo'}<input type="file" accept="image/*" hidden data-avatar></label>
+      ${S.profile.avatar_path ? '<button class="link-btn" data-action="remove-avatar">Retirer la photo</button>' : ''}</div></div>
+    <a class="btn" href="${profileLink(S.profile.username)}">Voir mon profil public</a>
+    <form data-form="bio"><label class="lbl" for="bio">Biographie</label>
+      <textarea id="bio" class="field" maxlength="300" placeholder="Tes cafés préférés, ta machine, ta façon de déguster…">${esc(S.profile.bio ?? '')}</textarea>
+      <div class="counter" id="bio-count">${(S.profile.bio ?? '').length} / 300</div>
+      <button class="btn secondary">Enregistrer la biographie</button></form>
+    <p class="hint">Ton profil est public : pseudo, photo, biographie et collection (avec tes notes et étoiles) sont visibles par tous.</p>
     <form data-form="username"><label class="lbl" for="un">Changer de pseudo</label>
       <input id="un" class="field" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_.\\-]{3,20}" value="${esc(S.profile.username)}" data-username-check autocomplete="username">
       <div class="hint" id="un-hint"></div><button class="btn secondary">Modifier le pseudo</button></form>
@@ -358,7 +448,31 @@ async function checkUsername(input) {
 }
 document.addEventListener('input', (e) => {
   if (e.target.matches?.('[data-username-check]')) { clearTimeout(usernameTimer); usernameTimer = setTimeout(() => checkUsername(e.target), 400); }
+  if (e.target.id === 'bio') $('bio-count').textContent = `${e.target.value.length} / 300`;
 });
+async function updateProfile(patch) {
+  const { error } = await sb.from('profiles').update(patch).eq('id', S.user.id);
+  if (error) return false;
+  S.profile = { ...S.profile, ...patch };
+  if (P.profile?.id === S.user.id) P.profile = { ...P.profile, ...patch };
+  M.q = null; // la liste des membres sera rechargée
+  return true;
+}
+// Photo de profil : recadrée en carré 320 px, envoyée dans avatars/<id>/, l'ancienne est supprimée.
+async function uploadAvatar(file) {
+  toast('Envoi de la photo…');
+  try {
+    const src = await fileToCanvas(file, 1024), side = Math.min(src.width, src.height);
+    const c = document.createElement('canvas'); c.width = c.height = Math.min(320, side);
+    c.getContext('2d').drawImage(src, (src.width - side) / 2, (src.height - side) / 2, side, side, 0, 0, c.width, c.height);
+    const path = `${S.user.id}/${Date.now()}.jpg`, old = S.profile.avatar_path;
+    const up = await sb.storage.from('avatars').upload(path, await canvasToBlob(c), { contentType: 'image/jpeg', cacheControl: '31536000' });
+    if (up.error) throw up.error;
+    if (!(await updateProfile({ avatar_path: path }))) { await sb.storage.from('avatars').remove([path]); throw new Error('profil'); }
+    if (old) sb.storage.from('avatars').remove([old]);
+    toast('Photo de profil mise à jour ✓'); render();
+  } catch { toast('Envoi impossible, réessaie avec une autre photo.'); }
+}
 document.addEventListener('submit', async (e) => {
   const form = e.target.closest('[data-form]'); if (!form) return;
   e.preventDefault();
@@ -379,7 +493,10 @@ document.addEventListener('submit', async (e) => {
       if (!(await checkUsername($('un')))) return;
       const { error } = await sb.from('profiles').update({ username: v }).eq('id', S.user.id);
       if (error) { toast(error.code === '23505' ? 'Ce pseudo est déjà utilisé.' : 'Pseudo invalide.'); return; }
-      S.profile = { ...S.profile, username: v }; toast('Pseudo enregistré ✓'); render();
+      S.profile = { ...S.profile, username: v }; M.q = null; P.username = null; toast('Pseudo enregistré ✓'); render();
+    } else if (kind === 'bio') {
+      const bio = $('bio').value.trim().slice(0, 300) || null;
+      if (await updateProfile({ bio })) { toast('Biographie enregistrée ✓'); render(); } else toast('Enregistrement impossible, réessaie.');
     } else if (kind === 'new-password') {
       const { error } = await sb.auth.updateUser({ password: $('np').value });
       if (error) toast(authMessage(error)); else { S.recovery = false; toast('Mot de passe modifié ✓'); render(); }
@@ -430,10 +547,17 @@ document.addEventListener('click', async (e) => {
     }
     case 'logout': await sb.auth.signOut(); toast('Déconnecté'); break;
     case 'delete-account': {
-      if (!confirm('Supprimer définitivement ton compte, ton pseudo et ta collection ? Cette action est irréversible.')) break;
+      if (!confirm('Supprimer définitivement ton compte, ton profil, ta photo et ta collection ? Cette action est irréversible.')) break;
+      const files = (await sb.storage.from('avatars').list(S.user.id)).data ?? [];
+      if (files.length) await sb.storage.from('avatars').remove(files.map((f) => `${S.user.id}/${f.name}`));
       const { error } = await sb.rpc('delete_my_account');
       if (error) { toast('Suppression impossible, réessaie.'); break; }
       await sb.auth.signOut(); toast('Compte supprimé'); location.hash = '#/';
+      break;
+    }
+    case 'remove-avatar': {
+      const old = S.profile.avatar_path;
+      if (await updateProfile({ avatar_path: null })) { sb.storage.from('avatars').remove([old]); toast('Photo retirée'); render(); } else toast('Impossible pour le moment, réessaie.');
       break;
     }
     case 'capture': capture(); break;
@@ -455,7 +579,9 @@ async function fileToCanvas(file, max = 1024) {
 const canvasToBlob = (c) => new Promise((res) => c.toBlob(res, 'image/jpeg', 0.85));
 document.addEventListener('change', async (e) => {
   const input = e.target;
-  if (input.dataset?.upload) {
+  if (input.dataset && 'avatar' in input.dataset) {
+    const file = input.files?.[0]; input.value = ''; if (file) uploadAvatar(file);
+  } else if (input.dataset?.upload) {
     const file = input.files?.[0]; input.value = ''; if (!file) return;
     toast('Envoi de la photo…');
     try {
