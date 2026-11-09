@@ -615,6 +615,7 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'capture': capture(); break;
+    case 'live-camera': liveWanted = true; startCamera(); break;
     case 'retake': resetScan(); break;
   }
 });
@@ -647,7 +648,7 @@ document.addEventListener('change', async (e) => {
       if (ins.error) throw ins.error;
       toast('Merci ! Photo envoyée pour validation.');
     } catch { toast('Envoi impossible, réessaie.'); }
-  } else if (input.id === 'scan-file') {
+  } else if (input.id === 'scan-file' || input.id === 'scan-native') {
     const file = input.files?.[0]; input.value = ''; if (!file) return;
     analyze(await fileToCanvas(file));
   }
@@ -655,6 +656,18 @@ document.addEventListener('change', async (e) => {
 
 // ---------------------------------------------------------------- scanner
 let stream = null, starting = null, scanRun = 0;
+// Caméra : le navigateur (surtout sur iPhone) redemande l'autorisation à chaque lancement de l'app.
+// On n'ouvre donc la vue en direct automatiquement que si l'autorisation est déjà accordée
+// (ou si elle a été acceptée pendant cette session) ; sinon on propose l'appareil photo du
+// téléphone, qui ne demande aucune autorisation.
+let liveWanted = false;
+async function cameraGranted() {
+  try { return (await navigator.permissions?.query({ name: 'camera' }))?.state === 'granted'; } catch { return false; }
+}
+function showCameraChoice(show) {
+  $('camera-choice').hidden = !show;
+  $('scan-frame').hidden = show; $('video').hidden = show;
+}
 const scanStatus = (html) => { $('scan-status').innerHTML = html; };
 async function startCamera() {
   if (stream || starting) return starting;
@@ -663,8 +676,8 @@ async function startCamera() {
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
       if (S.screen !== 'scan' || !$('photo-preview').hidden) { s.getTracks().forEach((t) => t.stop()); return; } // écran quitté entre-temps
-      stream = s; $('video').srcObject = s; await $('video').play().catch(() => {});
-    } catch { scanStatus('Accès à la caméra refusé. Autorise-le dans les réglages, ou utilise le bouton 🖼 pour choisir une photo.'); }
+      stream = s; liveWanted = true; showCameraChoice(false); $('video').srcObject = s; await $('video').play().catch(() => {});
+    } catch { showCameraChoice(true); scanStatus('Caméra en direct non autorisée : utilise « Prendre une photo » ou le bouton 🖼.'); }
   })().finally(() => { starting = null; });
   return starting;
 }
@@ -674,10 +687,14 @@ function resetScan() {
   $('photo-preview').hidden = true; $('photo-preview').removeAttribute('src');
   $('video').hidden = false; $('scan-frame').hidden = false; $('scan-results').innerHTML = '';
   scanStatus('Place la capsule dans le cadre, nom visible, sans flash.');
-  if (S.screen === 'scan') startCamera();
+  if (S.screen !== 'scan') return;
+  showCameraChoice(!liveWanted);
+  if (liveWanted) startCamera();
+  else cameraGranted().then((ok) => { if (ok && S.screen === 'scan' && $('photo-preview').hidden) startCamera(); });
 }
 function capture() {
   const v = $('video');
+  if (!stream) { $('scan-native').click(); return; } // pas de vue en direct : appareil photo du téléphone
   if (!v.videoWidth) { scanStatus('Caméra pas encore prête : patiente une seconde ou utilise le bouton 🖼.'); return; }
   const side = Math.min(v.videoWidth, v.videoHeight) * 0.76; // zone du cadre
   const sx = (v.videoWidth - side) / 2, sy = (v.videoHeight - side) / 2, out = Math.min(1024, side);
@@ -689,7 +706,7 @@ async function analyze(canvas) {
   const run = ++scanRun;
   stopCamera();
   const preview = $('photo-preview'); preview.src = canvas.toDataURL('image/jpeg', 0.85); preview.hidden = false;
-  $('video').hidden = true; $('scan-frame').hidden = true; $('scan-results').innerHTML = '';
+  $('video').hidden = true; $('scan-frame').hidden = true; $('camera-choice').hidden = true; $('scan-results').innerHTML = '';
   if (!S.loaded) { scanStatus('Le catalogue n’est pas encore chargé, réessaie dans un instant.'); return; }
   scanStatus('Analyse de la photo sur ton téléphone…<div class="progress"><div></div></div>');
   let data;

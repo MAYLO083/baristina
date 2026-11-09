@@ -66,6 +66,12 @@
         <video id="video" autoplay playsinline muted></video>
         <img id="photo-preview" alt="Photo prise" hidden>
         <div class="frame" id="scan-frame"></div>
+        <!-- Sans vue en direct : appareil photo de l'iPhone (aucune autorisation à donner) -->
+        <div class="camera-choice" id="camera-choice" hidden>
+          <label class="btn file-btn">📷 Prendre une photo<input id="scan-native" type="file" accept="image/*" capture="environment" hidden></label>
+          <p>Ouvre l’appareil photo du téléphone : aucune autorisation à donner.</p>
+          <button class="link-btn" data-action="live-camera">Utiliser la vue caméra en direct</button>
+        </div>
       </div>
       <div class="scan-controls">
         <label class="round-btn file-btn" title="Choisir une photo dans la galerie">🖼<input id="scan-file" type="file" accept="image/*" hidden></label>
