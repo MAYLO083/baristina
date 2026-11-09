@@ -23,6 +23,29 @@ alter table public.profiles add constraint profiles_avatar_path_check
   check (avatar_path is null or (avatar_path like id::text || '/%' and avatar_path ~ '^[0-9a-f-]{36}/[A-Za-z0-9_.-]{1,60}$'));
 alter table public.profiles enable row level security;
 
+-- Changement de pseudo : une fois tous les 7 jours (le premier choix du pseudo n'est pas limité).
+alter table public.profiles add column if not exists username_changed_at timestamptz;
+create or replace function public.limit_username_change()
+returns trigger
+language plpgsql set search_path = public
+as $$
+begin
+  if new.username is distinct from old.username and old.username is not null then
+    if old.username_changed_at is not null and old.username_changed_at > now() - interval '7 days' then
+      raise exception 'username_cooldown: un seul changement de pseudo tous les 7 jours';
+    end if;
+    new.username_changed_at := now();
+  else
+    new.username_changed_at := old.username_changed_at; -- non modifiable directement
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists profiles_username_cooldown on public.profiles;
+create trigger profiles_username_cooldown
+  before update on public.profiles
+  for each row execute function public.limit_username_change();
+
 drop policy if exists "Pseudos visibles" on public.profiles;
 create policy "Pseudos visibles" on public.profiles
   for select using (true);

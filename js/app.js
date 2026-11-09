@@ -98,7 +98,9 @@ function describe(p) {
 }
 
 // ---------------------------------------------------------------- profils publics : photo
-const PROFILE_FIELDS = 'id, username, bio, avatar_path, created_at';
+const PROFILE_FIELDS = 'id, username, bio, avatar_path, created_at, username_changed_at';
+const USERNAME_COOLDOWN_DAYS = 7;
+const nextUsernameChange = (pr) => pr?.username_changed_at ? new Date(new Date(pr.username_changed_at).getTime() + USERNAME_COOLDOWN_DAYS * 864e5) : null;
 const avatarURL = (pr) => pr?.avatar_path ? sb.storage.from('avatars').getPublicUrl(pr.avatar_path).data.publicUrl : null;
 function avatarHTML(pr, big = false) {
   const url = avatarURL(pr);
@@ -113,7 +115,8 @@ async function loadCatalog() {
     sb.from('products').select('*').eq('active', true),
   ]);
   if (b.error || p.error) { S.loadError = 'Impossible de charger le catalogue. Vérifie ta connexion.'; return; }
-  S.brands = new Map(b.data.map((x) => [x.id, x]));
+  // Seules les marques qui ont des capsules au catalogue (une marque retirée garde sa ligne en base).
+  S.brands = new Map(b.data.filter((x) => p.data.some((y) => y.brand_id === x.id)).map((x) => [x.id, x]));
   S.products = p.data;
   S.byId = new Map(p.data.map((x) => [x.id, x]));
   S.loaded = true;
@@ -136,6 +139,11 @@ function route() {
   const [a, b] = location.hash.replace(/^#\/?/, '').split('/');
   if (a === 'capsule' && b) { detailId = decodeURIComponent(b); R.delete(detailId); show('detail'); return; } // avis rechargés à chaque ouverture
   if (a === 'profil' && b) { openProfile(decodeURIComponent(b)); show('profile'); return; }
+  // « Compte » : mon profil public (modification via #/compte/modifier) ; sinon connexion / choix du pseudo.
+  if (a === 'compte') {
+    if (b !== 'modifier' && S.user && S.profile?.username && !S.recovery) { openProfile(S.profile.username); show('profile'); return; }
+    show('account'); return;
+  }
   show(ROUTES[a] ?? 'home');
 }
 function show(name) {
@@ -144,13 +152,17 @@ function show(name) {
   S.screen = name;
   for (const [k, id] of Object.entries(SCREENS)) $(id).classList.toggle('active', k === name);
   document.body.classList.toggle('on-home', name === 'home');
-  document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('active', a.dataset.nav === name));
+  const navKey = location.hash.startsWith('#/compte') ? 'account' : name;
+  document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('active', a.dataset.nav === navKey));
   render();
   window.scrollTo(0, name === 'catalog' ? S.catalogScroll : 0);
   if (name === 'scan') resetScan();
 }
 function render() {
-  $('home-account-label').textContent = S.profile?.username ? `Mon compte · ${S.profile.username}` : (S.user ? 'Mon compte' : 'Se connecter');
+  // Bulle de profil en haut à droite de l'accueil : ma photo (ou initiale), sinon une silhouette (connexion).
+  $('home-avatar').innerHTML = S.profile?.username ? avatarHTML(S.profile)
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  $('home-avatar').setAttribute('aria-label', S.profile?.username ? `Mon profil (${S.profile.username})` : 'Se connecter');
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile })[S.screen]?.();
 }
 window.addEventListener('hashchange', route);
@@ -392,9 +404,8 @@ function renderProfile() {
   const rated = items.filter((x) => x.i.rating);
   const avg = rated.length ? (rated.reduce((s, x) => s + x.i.rating, 0) / rated.length).toFixed(1).replace('.', ',') : '–';
   const brands = new Set(items.map((x) => x.p.brand_id)).size;
-  let html = `<div class="profile-head">${avatarHTML(pr, true)}<h1>${esc(pr.username)}</h1><div class="since">Membre depuis ${esc(monthYear(pr.created_at))}</div>
+  let html = `<div class="profile-head">${mine ? '<a class="edit-btn" href="#/compte/modifier">✎ Modifier</a>' : ''}${avatarHTML(pr, true)}<h1>${esc(pr.username)}</h1><div class="since">Membre depuis ${esc(monthYear(pr.created_at))}</div>
     ${pr.bio ? `<p class="bio">${esc(pr.bio)}</p>` : ''}</div>
-    ${mine ? '<a class="btn secondary" href="#/compte">Modifier mon profil</a>' : ''}
     <div class="stats four"><div class="stat"><b>${items.length}</b><span>références</span></div><div class="stat"><b>${items.reduce((s, x) => s + x.i.quantity, 0)}</b><span>capsules</span></div><div class="stat"><b>${brands}</b><span>marque${brands > 1 ? 's' : ''}</span></div><div class="stat"><b>${avg}</b><span>note moy.</span></div></div>`;
   if (!items.length) { box.innerHTML = html + `<div class="empty">${mine ? 'Ta collection est vide pour l’instant.' : 'Sa collection est vide pour l’instant.'}</div>`; return; }
   const favs = rated.filter((x) => x.i.rating >= 4).sort((a, b) => b.i.rating - a.i.rating || a.p.name.localeCompare(b.p.name, 'fr')).slice(0, 5);
@@ -453,18 +464,23 @@ function renderAccount() {
     <div class="box flush avatar-edit">${avatarHTML(S.profile, true)}<div class="actions"><h3>${esc(S.profile.username)}</h3><p class="hint">${esc(S.user.email ?? '')}</p>
       <label class="btn secondary file-btn">${S.profile.avatar_path ? 'Changer de photo' : 'Ajouter une photo'}<input type="file" accept="image/*" hidden data-avatar></label>
       ${S.profile.avatar_path ? '<button class="link-btn" data-action="remove-avatar">Retirer la photo</button>' : ''}</div></div>
-    <a class="btn" href="${profileLink(S.profile.username)}">Voir mon profil public</a>
     <form data-form="bio"><label class="lbl" for="bio">Biographie</label>
       <textarea id="bio" class="field" maxlength="300" placeholder="Tes cafés préférés, ta machine, ta façon de déguster…">${esc(S.profile.bio ?? '')}</textarea>
       <div class="counter" id="bio-count">${(S.profile.bio ?? '').length} / 300</div>
       <button class="btn secondary">Enregistrer la biographie</button></form>
     <p class="hint">Ton profil est public : pseudo, photo, biographie et collection (avec tes notes et étoiles) sont visibles par tous.</p>
-    <form data-form="username"><label class="lbl" for="un">Changer de pseudo</label>
-      <input id="un" class="field" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_.\\-]{3,20}" value="${esc(S.profile.username)}" data-username-check autocomplete="username">
-      <div class="hint" id="un-hint"></div><button class="btn secondary">Modifier le pseudo</button></form>
+    ${usernameFormHTML()}
     <button class="btn" data-action="logout">Se déconnecter</button>
     <button class="btn danger" data-action="delete-account">Supprimer mon compte</button>
     <p class="disclaimer">Baristina V1 — application indépendante, non affiliée aux marques citées. Les informations produits proviennent des sites officiels des marques.</p>`;
+}
+// Changement de pseudo : une fois tous les 7 jours (règle vérifiée aussi par la base de données).
+function usernameFormHTML() {
+  const next = nextUsernameChange(S.profile), locked = next && next > new Date();
+  return `<form data-form="username"><label class="lbl" for="un">Changer de pseudo</label>
+      <input id="un" class="field" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_.\\-]{3,20}" value="${esc(S.profile.username)}" data-username-check autocomplete="username"${locked ? ' disabled' : ''}>
+      <div class="hint" id="un-hint">${locked ? `Tu pourras changer de pseudo à partir du ${esc(next.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))} à ${esc(next.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}.` : `Possible une fois tous les ${USERNAME_COOLDOWN_DAYS} jours.`}</div>
+      <button class="btn secondary"${locked ? ' disabled' : ''}>Modifier le pseudo</button></form>`;
 }
 let usernameTimer;
 async function checkUsername(input) {
@@ -520,13 +536,18 @@ document.addEventListener('submit', async (e) => {
       if (!(await checkUsername($('su')))) return;
       const { data, error } = await sb.auth.signUp({ email: $('se').value.trim(), password: $('sp').value, options: { data: { username }, emailRedirectTo: redirectURL() } });
       if (error) { toast(authMessage(error)); if (/database error/i.test(error.message)) checkUsername($('su')); }
+      // E-mail déjà utilisé : Supabase renvoie un compte sans identité (un seul compte par adresse).
+      else if (data.user && !data.user.identities?.length) toast('Un compte existe déjà avec cet e-mail. Connecte-toi ou utilise « Mot de passe oublié ».');
       else if (!data.session) $('account-content').innerHTML = '<div class="notice">Compte créé ! Ouvre le lien reçu par e-mail pour l’activer, puis reviens te connecter.</div>';
     } else if (kind === 'username') {
       const v = $('un').value.trim();
       if (!(await checkUsername($('un')))) return;
-      const { error } = await sb.from('profiles').update({ username: v }).eq('id', S.user.id);
-      if (error) { toast(error.code === '23505' ? 'Ce pseudo est déjà utilisé.' : 'Pseudo invalide.'); return; }
-      S.profile = { ...S.profile, username: v }; M.q = null; P.username = null; toast('Pseudo enregistré ✓'); render();
+      if (v === S.profile?.username) return;
+      const { data, error } = await sb.from('profiles').update({ username: v }).eq('id', S.user.id).select(PROFILE_FIELDS).single();
+      if (error) { toast(error.code === '23505' ? 'Ce pseudo est déjà utilisé.' : /username_cooldown/.test(error.message) ? `Un seul changement de pseudo tous les ${USERNAME_COOLDOWN_DAYS} jours.` : 'Pseudo invalide.'); return; }
+      const first = !S.profile?.username;
+      S.profile = data; M.q = null; P.username = null; toast('Pseudo enregistré ✓');
+      if (first) route(); else render();
     } else if (kind === 'bio') {
       const bio = $('bio').value.trim().slice(0, 300) || null;
       if (await updateProfile({ bio })) { toast('Biographie enregistrée ✓'); render(); } else toast('Enregistrement impossible, réessaie.');
@@ -703,7 +724,7 @@ async function onSession(session) {
   S.user = session?.user ?? null;
   await loadUserData(); S.profileLoaded = true;
   if (S.user && !S.profile?.username && S.screen !== 'account') location.hash = '#/compte'; // pseudo obligatoire
-  render();
+  if (location.hash.startsWith('#/compte')) route(); else render(); // « Compte » : profil ou connexion selon la session
   if (S.screen === 'scan' && $('photo-preview').hidden) resetScan();
 }
 async function start() {

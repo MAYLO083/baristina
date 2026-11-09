@@ -1,7 +1,8 @@
 # Baristina V1
 
 Application web mobile : scanner, catalogue et collection de capsules compatibles **Nespresso Original**
-(Nespresso, L'Or, Starbucks, Carte Noire, Lavazza, Café Royal).
+(Nespresso, L'Or, Starbucks, Carte Noire, Lavazza, illy, Segafredo, Kimbo, Caffè Borbone).
+Règle : une marque n'est ajoutée que si son site officiel montre clairement ses capsules.
 
 - **Supabase** : comptes, collection, catalogue, photos de la communauté.
 - **IA de scan gratuite, sur le téléphone** : aucune IA payante, aucune photo envoyée sur internet.

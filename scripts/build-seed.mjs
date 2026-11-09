@@ -8,7 +8,7 @@
 //  - une information non confirmée reste vide (null / []).
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 
-const VERIFIED = '2026-11-08';
+const VERIFIED = '2026-11-09';
 
 const BRANDS = [
   { id: 'nespresso',   name: 'Nespresso',    website: 'https://www.nespresso.com/fr/fr/order/capsules/original', sort: 1 },
@@ -16,8 +16,12 @@ const BRANDS = [
   { id: 'starbucks',   name: 'Starbucks',    website: 'https://www.starbucksathome.com/fr/produits/starbucks-nespresso', sort: 3 },
   { id: 'carte-noire', name: 'Carte Noire',  website: 'https://www.cartenoire.fr/fr/cafes/capsules/nespresso', sort: 4 },
   { id: 'lavazza',     name: 'Lavazza',      website: 'https://www.lavazza.fr/fr/cafe/capsules-compatibles.html', sort: 5 },
-  { id: 'cafe-royal',  name: 'Café Royal',   website: 'https://cafe-royal.com/fr-ch/produits/capsules-de-cafe', sort: 6 },
+  { id: 'illy',        name: 'illy',         website: 'https://www.illy.com/fr-fr/cafe/capsules-compatibles', sort: 6 },
+  { id: 'segafredo',   name: 'Segafredo',    website: 'https://www.segafredo.fr/nos-produits/a-la-maison/cafe/capsules-compatibles-nespresso', sort: 7 },
+  { id: 'kimbo',       name: 'Kimbo',        website: 'https://kimbo.it/collections/nespresso-alluminio', sort: 8 },
+  { id: 'borbone',     name: 'Caffè Borbone', website: 'https://www.caffeborbone.com/en-eu/collections/compatible-capsules-nespresso', sort: 9 },
 ];
+// Café Royal retiré (novembre 2026) : aucun visuel de capsule sur son site officiel.
 
 const R = 'Ristretto 25 ml', E = 'Espresso 40 ml', L = 'Lungo 110 ml', C = 'Cappuccino';
 const NES = 'https://www.nespresso.com/fr/fr/order/capsules/original/';
@@ -118,7 +122,6 @@ const carteNoire = [
   ['cuvee-de-caractere', 'Cuvée de Caractère', 8, [E], ['fruité', 'noisette'], { origin: 'Assemblage Arabica et Robusta' }, 'cuvee-de-caractere'],
   ['l-iconique', "L'Iconique", 8, [L], ['fruité', 'céréales grillées'], {}, 'iconique'],
   ['espresso-classique-7', 'Espresso Classique N°7', 7, [E], [], {}, 'classique.60728'],
-  ['espresso-solidaire', 'Espresso Solidaire', 7, [E], ['chocolat au lait'], { highlight: 'Gamme solidaire (détails sur le site de la marque)' }, 'solidaire'],
   ['espresso-demi-cafeine', 'Espresso Demi-Caféiné', 7, [E], ['céréales grillées', 'fruits secs'], { highlight: 'Mi-caféiné : 50 % de café décaféiné' }, 'demi-cafeine'],
   ['lungo-classique-6', 'Espresso Lungo Classique N°6', 6, [L], [], {}, 'lungo.60729'],
   ['espresso-decafeine', 'Espresso Décaféiné', 6, [E], ['caramel', 'céréales grillées'], { decaf: true }, 'decafeine.60732'],
@@ -136,16 +139,47 @@ const lavazza = [
   ['espresso-maestro-lungo', 'Espresso Maestro Lungo', 'Espresso Maestro', 5, [], [], {}, 'nespresso-compatible-espresso-maestro-lungo'],
 ];
 
-const ROYAL = 'https://cafe-royal.com/fr-ch/produits/capsules-de-cafe';
-const cafeRoyal = [
-  ['ristretto', 'Ristretto', 'Classiques', {}],
-  ['espresso', 'Espresso', 'Classiques', {}],
-  ['lungo', 'Lungo', 'Classiques', {}],
-  ['espresso-decaffeinato', 'Espresso Decaffeinato', 'Classiques', { decaf: true }],
-  ['caramel', 'Caramel', 'Flavoured Edition', { flavoured: true, aromas: ['caramel'] }],
-  ['vanilla', 'Vanilla', 'Flavoured Edition', { flavoured: true, aromas: ['vanille'] }],
-  ['hazelnut', 'Hazelnut', 'Flavoured Edition', { flavoured: true, aromas: ['noisette'] }],
-  ['almond', 'Almond', 'Flavoured Edition', { flavoured: true, aromas: ['amande'] }],
+// illy : intensité donnée sur 9 (échelle illy) → gardée en « particularité », pas convertie.
+const ILLY = 'https://www.illy.com/fr-fr/cafe/capsules-compatibles/';
+const illy = [
+  ['classico', 'Classico', 5, [E], ['caramel', "fleur d'oranger", 'jasmin'], {}, 'capsules-cafe-torrefaction-classique/8908ME.html'],
+  ['intenso', 'Intenso', 7, [E], ['cacao', 'fruits secs'], {}, 'capsules-cafe-torrefaction-intense/8911ME.html'],
+  ['forte', 'Forte', 9, [E], ['pain grillé', 'chocolat noir'], {}, 'capsules-cafe-torrefaction-forte/8909ME.html'],
+  ['decaffeinato', 'Décaféiné', 5, [E], ['caramel', 'chocolat', 'pain grillé'], { decaf: true }, 'capsules-cafe-torrefaction-decafeine/8994ST.html'],
+  ['classico-lungo', 'Classico Lungo', 5, [L], ['caramel', "fleur d'oranger", 'jasmin'], {}, 'capsules-cafe-allonge/8910ST.html'],
+  ['intenso-lungo', 'Intenso Lungo', 7, [L], ['cacao', 'fruits secs'], {}, 'capsules-cafe-intenso-allonge/24072ME.html'],
+];
+
+// Segafredo : intensité lue sur la boîte (échelle non précisée) → gardée en « particularité ».
+const SEG = 'https://www.segafredo.fr/nos-produits/a-la-maison/cafe/capsules-compatibles-nespresso/';
+const segafredo = [
+  ['intenso', 'Intenso', 'Espresso', 12, ['chocolat', 'agrumes'], { origin: "Arabicas d'Amérique du Sud et d'Afrique" }, 'capsules-intenso'],
+  ['ristretto', 'Ristretto', 'Espresso', 11, [], {}, 'capsules-ristretto'],
+  ['classico', 'Classico', 'Espresso', 10, ['miel', 'caramel'], {}, 'capsules-classico'],
+  ['100-arabica', '100% Arabica', 'Espresso', 9, ['floral', 'chocolat'], { origin: '100 % Arabica' }, 'capsules-100-arabica'],
+  ['peru', 'Perù', 'Le Origini', 9, ['chocolat'], { origin: 'Pérou (100 % Arabica)' }, 'capsules-peru'],
+  ['brasile', 'Brasile', 'Le Origini', 8, ['miel'], { origin: 'Brésil (100 % Arabica)' }, 'capsules-brasile'],
+];
+
+// Kimbo : intensité sur 13, torréfaction et notes aromatiques indiquées sur kimbo.it.
+const KIMBO = 'https://kimbo.it/products/';
+const kimbo = [
+  ['espresso-napoli', 'Barista Espresso Napoli', 10, [E], ['biscuit', 'fleurs', 'vanille'], { origin: 'Arabica et Robusta', highlight: 'Torréfaction moyenne-foncée' }, 'capsule-compatibili-nespresso®-original-in-alluminio-espresso-napoli'],
+  ['barista-ristretto', 'Espresso Barista Ristretto', 12, [R], ['chocolat noir', 'caramel', 'malt'], { roast: 'dark' }, 'capsule-compatibili-nespresso®-original-in-alluminio-barista-ristretto'],
+  ['barista-100-arabica', 'Espresso Barista 100% Arabica', 9, [E], ['fleurs', 'pain grillé', 'miel'], { origin: '100 % Arabica', highlight: 'Torréfaction moyenne-foncée' }, 'capsule-compatibili-nespresso®-original-in-alluminio-espresso-barista-100-arabica'],
+  ['barista-decaf', 'Espresso Barista Decaf', 9, [E], ['châtaigne séchée'], { roast: 'medium', decaf: true }, 'capsule-compatibili-nespresso®-original-in-alluminio-espresso-barista-decaf'],
+  ['macinato-fresco', 'Macinato Fresco', 11, [E], ['chocolat noir', 'épices'], { roast: 'dark' }, 'capsule-compatibili-nespresso®-original-in-alluminio-macinato-fresco'],
+];
+
+// Caffè Borbone : gamme Respresso (la gamme aluminium n'a qu'un petit dessin de capsule : non retenue).
+const BORBONE = 'https://www.caffeborbone.com/en-eu/products/';
+const borbone = [
+  ['respresso-gold', 'Respresso Gold', ['doux', 'raffiné'], {}, 'gold-blend-capsules-borbone-respresso-compatible-nespresso'],
+  ['respresso-red', 'Respresso Red', ['corsé', 'crémeux'], {}, 'red-blend-capsules-borbone-respresso-compatible-nespresso'],
+  ['respresso-blue', 'Respresso Blue', ['équilibré', 'corsé'], {}, 'blue-blend-capsules-borbone-respresso-compatible-nespresso'],
+  ['respresso-black', 'Respresso Black', ['intense', 'robuste'], {}, 'black-blend-capsules-borbone-respresso-compatible-nespresso'],
+  ['respresso-dek-green', 'Respresso Dek Green', [], { decaf: true }, 'dek-green-blend-capsules-borbone-respresso-compatible-nespresso'],
+  ['respresso-light', 'Respresso Light', [], { highlight: 'Mi-caféiné : 50 % Blue, 50 % Dek' }, 'capsules-light-blend-borbone-respresso-compatible-nespresso'],
 ];
 
 // ---------------------------------------------------------------------
@@ -178,9 +212,21 @@ for (const [id, name, range, intensity, cups, aromas, x, slug] of lavazza) {
   add({ id: 'lavazza-' + id, brand_id: 'lavazza', name, range, intensity, cup_sizes: cups, aromas,
     origin: x.origin ?? null, highlight: x.highlight ?? null, decaf: !!x.decaf, shop_url: LVZ + slug });
 }
-for (const [id, name, range, x] of cafeRoyal) {
-  add({ id: 'cafe-royal-' + id, brand_id: 'cafe-royal', name, range, aromas: x.aromas ?? [],
-    decaf: !!x.decaf, flavoured: !!x.flavoured, shop_url: ROYAL });
+for (const [id, name, i9, cups, aromas, x, path] of illy) {
+  add({ id: 'illy-' + id, brand_id: 'illy', name, range: cups[0] === L ? 'Lungo' : 'Espresso', cup_sizes: cups, aromas,
+    origin: '100 % Arabica', highlight: `Intensité ${i9} sur 9 (échelle illy)`, decaf: !!x.decaf, shop_url: ILLY + path });
+}
+for (const [id, name, range, i, aromas, x, slug] of segafredo) {
+  add({ id: 'segafredo-' + id, brand_id: 'segafredo', name, range, cup_sizes: [E], aromas,
+    origin: x.origin ?? null, highlight: `Intensité ${i} indiquée sur la boîte`, shop_url: SEG + slug });
+}
+for (const [id, name, intensity, cups, aromas, x, handle] of kimbo) {
+  add({ id: 'kimbo-' + id, brand_id: 'kimbo', name, range: 'Capsules aluminium', intensity, cup_sizes: cups, aromas,
+    origin: x.origin ?? null, roast: x.roast ?? null, highlight: x.highlight ?? null, decaf: !!x.decaf, shop_url: KIMBO + encodeURIComponent(handle) });
+}
+for (const [id, name, aromas, x, handle] of borbone) {
+  add({ id: 'borbone-' + id, brand_id: 'borbone', name, range: 'Respresso', aromas,
+    highlight: x.highlight ?? null, decaf: !!x.decaf, shop_url: BORBONE + handle });
 }
 
 // Photo officielle (affichée depuis le site de la marque) quand il n'y a pas de photo locale.

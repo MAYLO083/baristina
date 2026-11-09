@@ -64,7 +64,7 @@ function editSim(a, b) {
 }
 const BRAND_PATTERNS = {
   nespresso: /nespresso/, lor: /\bl ?or\b/, starbucks: /starbucks/, 'carte-noire': /carte ?noire/,
-  lavazza: /lavazza/, 'cafe-royal': /cafe ?royal/,
+  lavazza: /lavazza/, illy: /illy/, segafredo: /segafredo/, kimbo: /kimbo/, borbone: /borbone|respresso/,
 };
 const GENERIC = new Set(['espresso', 'lungo', 'ristretto', 'capsule', 'capsules', 'coffee', 'cafe', 'roast', 'blend', 'the', 'and', 'des', 'les', 'aux']);
 // Score 0..1 : part des mots distinctifs du nom retrouvés dans le texte lu.
