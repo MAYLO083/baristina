@@ -9,8 +9,11 @@
   --nav-h: 64px;
 }
 * { box-sizing: border-box; }
+/* Pas de zoom : double tap désactivé, texte jamais agrandi automatiquement */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 html, body { margin: 0; background: #ddd3c2; color: var(--ink); font-family: var(--font); }
 button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; } /* < 16 px : l'iPhone zoome sur le champ */
 button { cursor: pointer; }
 img { display: block; max-width: 100%; }
 a { color: var(--green); }

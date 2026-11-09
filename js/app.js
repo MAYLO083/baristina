@@ -11,6 +11,11 @@ const sb = CONFIGURED
   ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, detectSessionInUrl: true, flowType: 'pkce' } })
   : null;
 
+// ---------------------------------------------------------------- pas de zoom
+// Safari (iPhone) ignore « user-scalable=no » : on bloque le pincement à deux doigts nous-mêmes.
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
 // ---------------------------------------------------------------- état
 const S = {
   brands: new Map(), products: [], byId: new Map(), loaded: false, loadError: null,
