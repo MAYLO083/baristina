@@ -134,7 +134,7 @@ const SCREENS = { home: 'screen-home', catalog: 'screen-catalog', detail: 'scree
 let detailId = null;
 function route() {
   const [a, b] = location.hash.replace(/^#\/?/, '').split('/');
-  if (a === 'capsule' && b) { detailId = decodeURIComponent(b); show('detail'); return; }
+  if (a === 'capsule' && b) { detailId = decodeURIComponent(b); R.delete(detailId); show('detail'); return; } // avis rechargés à chaque ouverture
   if (a === 'profil' && b) { openProfile(decodeURIComponent(b)); show('profile'); return; }
   show(ROUTES[a] ?? 'home');
 }
@@ -249,6 +249,7 @@ function renderDetail() {
     <p class="description">${esc(describe(p))}</p>
     <div class="facts">${facts}</div>
     ${collectionBoxHTML(p)}
+    <div id="reviews">${reviewsHTML(p)}</div>
     <a class="shop-link" href="${esc(p.shop_url)}" target="_blank" rel="noopener noreferrer">Voir sur la boutique officielle ↗</a>
     <p class="source">${verified ? `Informations relevées sur le site de la marque le ${esc(verified)}.` : ''} Prix et disponibilité sur la boutique officielle.</p>
     ${S.user && !p.photo_url ? `<div class="box"><h3>Proposer une photo</h3><p class="hint">Photographie la capsule de côté, bien centrée, sans flash. Elle sera visible par tous après validation.</p><label class="btn secondary file-btn">Choisir une photo<input type="file" accept="image/*" hidden data-upload="${esc(p.id)}"></label></div>` : ''}
@@ -269,6 +270,37 @@ function collectionBoxHTML(p) {
     <button class="link-btn" data-action="remove" data-id="${esc(p.id)}">Retirer de ma collection</button></div>`;
 }
 
+// ---------------------------------------------------------------- avis de la communauté (fiche capsule)
+// Les collections sont publiques : on agrège celles qui contiennent la capsule.
+const R = new Map(); // id capsule → { items, profiles } | 'loading' | 'error'
+async function loadReviews(id) {
+  R.set(id, 'loading');
+  const { data: items, error } = await sb.from('collection_items').select('user_id, quantity, rating, note, updated_at').eq('product_id', id).order('updated_at', { ascending: false }).limit(500);
+  let profiles = [];
+  const ids = [...new Set((items ?? []).filter((i) => i.rating || i.note).slice(0, 20).map((i) => i.user_id))];
+  if (!error && ids.length) profiles = (await sb.from('profiles').select(PROFILE_FIELDS).in('id', ids)).data ?? [];
+  R.set(id, error ? 'error' : { items, profiles: new Map(profiles.map((x) => [x.id, x])) });
+  if (S.screen === 'detail' && detailId === id && $('reviews')) $('reviews').innerHTML = reviewsHTML(S.byId.get(id));
+}
+function refreshReviews(id) { if (R.has(id)) loadReviews(id); }
+function reviewsHTML(p) {
+  if (!CONFIGURED || !p) return '';
+  const r = R.get(p.id);
+  if (!r) { loadReviews(p.id); return ''; }
+  if (r === 'loading' || r === 'error') return '';
+  const rated = r.items.filter((i) => i.rating);
+  const owners = r.items.length;
+  if (!owners) return `<div class="box"><h3>Avis de la communauté</h3><p class="hint">Aucun membre n’a encore cette capsule dans sa collection.</p></div>`;
+  const avg = rated.length ? rated.reduce((s, i) => s + i.rating, 0) / rated.length : 0;
+  const summary = `${rated.length ? `<div class="avg"><b>${avg.toFixed(1).replace('.', ',')}</b>${miniStars(Math.round(avg))}<span>${rated.length} note${rated.length > 1 ? 's' : ''}</span></div>` : ''}
+    <p class="hint">${owners} membre${owners > 1 ? 's l’ont' : ' l’a'} dans sa collection.</p>`;
+  const list = r.items.filter((i) => (i.rating || i.note) && r.profiles.get(i.user_id)?.username).slice(0, 20).map((i) => {
+    const pr = r.profiles.get(i.user_id), me = i.user_id === S.user?.id;
+    return `<a class="review" href="${profileLink(pr.username)}">${avatarHTML(pr)}<div class="meta"><strong>${esc(pr.username)}${me ? ' <small>(toi)</small>' : ''}</strong>${i.rating ? miniStars(i.rating) : ''}${i.note ? `<p>« ${esc(i.note)} »</p>` : ''}<span class="date">${esc(new Date(i.updated_at).toLocaleDateString('fr-FR'))}</span></div></a>`;
+  }).join('');
+  return `<div class="box"><h3>Avis de la communauté</h3>${summary}${list}</div>`;
+}
+
 // ---------------------------------------------------------------- collection (Supabase)
 async function saveItem(id, patch) {
   const prev = S.collection.get(id);
@@ -276,13 +308,14 @@ async function saveItem(id, patch) {
   S.collection.set(id, next); render();
   const { error } = await sb.from('collection_items').upsert({ user_id: S.user.id, product_id: id, quantity: next.quantity, rating: next.rating, note: next.note, updated_at: next.updated_at });
   if (error) { prev ? S.collection.set(id, prev) : S.collection.delete(id); render(); toast('Enregistrement impossible, réessaie.'); return false; }
+  refreshReviews(id);
   return true;
 }
 async function removeItem(id) {
   const prev = S.collection.get(id); if (!prev) return;
   S.collection.delete(id); render();
   const { error } = await sb.from('collection_items').delete().eq('user_id', S.user.id).eq('product_id', id);
-  if (error) { S.collection.set(id, prev); render(); toast('Suppression impossible, réessaie.'); } else toast('Capsule retirée de ta collection');
+  if (error) { S.collection.set(id, prev); render(); toast('Suppression impossible, réessaie.'); } else { toast('Capsule retirée de ta collection'); refreshReviews(id); }
 }
 function renderCollection() {
   const box = $('collection-content');

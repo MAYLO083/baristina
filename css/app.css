@@ -177,3 +177,17 @@ a.btn { display: block; text-align: center; text-decoration: none; }
 .avatar-edit .btn { margin-top: 6px; padding: 10px; }
 .counter { text-align: right; font-size: 11px; color: var(--muted); margin-top: 4px; }
 .btn + .stats { margin-top: 12px; }
+
+/* Avis de la communauté */
+.avg { display: flex; align-items: center; gap: 8px; }
+.avg b { font-size: 24px; color: var(--green); }
+.avg .mini-stars { font-size: 16px; color: var(--gold); }
+.avg .mini-stars .off, .review .mini-stars .off { color: #cfc3ad; }
+.avg span:last-child { font-size: 12px; color: var(--muted); }
+.review { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid #e6d9c3; color: inherit; text-decoration: none; }
+.review .avatar { width: 36px; height: 36px; font-size: 15px; }
+.review .meta { flex: 1; min-width: 0; }
+.review strong { font-size: 14px; } .review small { font-weight: 400; color: var(--muted); }
+.review .mini-stars { display: block; font-size: 12px; color: var(--gold); }
+.review p { margin: 4px 0 0; font-size: 13px; line-height: 1.45; font-style: italic; overflow-wrap: anywhere; white-space: pre-line; }
+.review .date { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); }
