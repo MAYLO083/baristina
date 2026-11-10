@@ -19,10 +19,13 @@
     <a class="home-avatar" id="home-avatar" href="#/compte" aria-label="Mon profil"></a>
     <div class="home-visual"><img src="home-reference-clean.jpg" alt="Baristina — tasse et dosettes de café"></div>
     <div class="home-actions">
-      <a class="action red" href="#/scanner"><span class="ico" aria-hidden="true">◎</span><span class="txt">Scanner une capsule</span><span class="arr">›</span></a>
-      <button class="action sage" data-action="open-moods"><span class="ico" aria-hidden="true">✦</span><span class="txt">Une envie ? Choisis selon ton humeur</span><span class="arr">›</span></button>
-      <a class="action terracotta" href="#/collection"><span class="ico" aria-hidden="true">♡</span><span class="txt">Ma collection</span><span class="arr">›</span></a>
-      <a class="action green" href="#/catalogue"><span class="ico" aria-hidden="true">☰</span><span class="txt">Catalogue</span><span class="arr">›</span></a>
+      <p class="home-hello"><span id="home-hello-name">Bonjour,</span> qu’est-ce qu’on déguste aujourd’hui ?</p>
+      <div class="tiles">
+        <a class="tile t-red" href="#/scanner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M9 15.5h6l-1-6.5a2 2 0 0 0-4 0z"/><path d="M8 15.5h8"/></svg><b>Scanner</b><small>une capsule</small></a>
+        <a class="tile t-green" href="#/collection"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></svg><b>Ma collection</b><small>mes capsules préférées</small></a>
+        <a class="tile t-terracotta" href="#/catalogue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5z"/><path d="M12 6.5v13"/></svg><b>Catalogue</b><small>toutes les références</small></a>
+        <button class="tile t-sage" data-action="open-moods"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><b>Une envie ?</b><small>Choisis selon ton humeur</small></button>
+      </div>
       <p class="disclaimer">Baristina est une application indépendante, non affiliée à Nestlé Nespresso SA ni aux autres marques citées. Les noms de produits sont des marques de leurs propriétaires respectifs.</p>
     </div>
   </section>

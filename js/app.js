@@ -243,6 +243,19 @@ const MOODS = [
   { id: 'soiree', emoji: '🌙', name: 'Douce soirée', line: 'Le goût du café le soir, et le sommeil en prime.', c: ['#2b2540', '#6a2b72'],
     score: (p) => (p.decaf ? 3 : 0) + (/mi-caf/i.test(p.highlight ?? '') ? 2 : 0) },
 ];
+const MOOD_ICONS = {
+  douceur: '<path d="M7 18.5h10.5a4 4 0 0 0 .4-8A6 6 0 0 0 6.4 9.6 4.5 4.5 0 0 0 7 18.5z"/>',
+  energie: '<path d="M13.5 2.5 4.5 14h7l-1 7.5 9-11.5h-7z"/>',
+  gourmand: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 9.5h.01M14 8h.01M15.5 13.5h.01M10 15h.01M12 11.5h.01" stroke-width="2.6"/>',
+  cocooning: '<path d="M4 10h12v4.5A5.5 5.5 0 0 1 10.5 20h-1A5.5 5.5 0 0 1 4 14.5z"/><path d="M16 11.5h1.3a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5c-1 1.2 1 2 0 3.5M12 3.5c-1 1.2 1 2 0 3.5"/>',
+  hiver: '<path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6"/><path d="m9.5 4 2.5 2 2.5-2M9.5 20l2.5-2 2.5 2M4 10.6l3.2-.5L6 7.2M20 13.4l-3.2.5 1.2 2.9M4 13.4l3.2.5L6 16.8M20 10.6l-3.2-.5 1.2-2.9"/>',
+  soleil: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  evasion: '<circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.3 5.3-5.3 2.3 2.3-5.3z"/>',
+  dolcevita: '<path d="M3 20.5h18M4 20.5V8.5c3.5-2.5 12.5-2.5 16 0v12"/><path d="M4 12.5h16M4 16.5h16"/><path d="M7 20.5V19a1 1 0 0 1 2 0v1.5M11 20.5V19a1 1 0 0 1 2 0v1.5M15 20.5V19a1 1 0 0 1 2 0v1.5M7 12.5V11a1 1 0 0 1 2 0v1.5M11 12.5V11a1 1 0 0 1 2 0v1.5M15 12.5V11a1 1 0 0 1 2 0v1.5"/>',
+  latte: '<path d="M5 8.5h12V13a6 6 0 0 1-12 0z"/><path d="M17 9.5h1a2.3 2.3 0 0 1 0 4.6h-1"/><path d="M11 13.8l-1.3-1.3a.9.9 0 0 1 1.3-1.2.9.9 0 0 1 1.3 1.2z"/><path d="M4 21h14"/>',
+  soiree: '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.3 6.3 0 0 0 10 10z"/><path d="M17 3.5v3M15.5 5h3"/>',
+};
+const moodIcon = (m, cls = '') => `<svg class="mood-ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${MOOD_ICONS[m.id] ?? ''}</svg>`;
 const MOOD = { id: null, system: 'all' };
 function moodList(m) {
   return S.products.map((p) => [p, m.score(p)]).filter(([, s]) => s >= (m.min ?? 1))
@@ -250,12 +263,12 @@ function moodList(m) {
 }
 function openMoods() {
   const tiles = MOODS.map((m, i) => `<a class="mood" href="#/humeur/${m.id}" data-action="close-overlay" style="--c1:${m.c[0]};--c2:${m.c[1]};--d:${i}">
-      <span class="mood-emoji" aria-hidden="true">${m.emoji}</span><b>${esc(m.name)}</b><small>${esc(m.line)}</small></a>`).join('');
+      ${moodIcon(m)}<span class="mood-txt"><b>${esc(m.name)}</b><small>${esc(m.line)}</small></span>${moodIcon(m, 'ghost')}</a>`).join('');
   openOverlay(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="moods-title">
     <div class="sheet-grip" aria-hidden="true"></div>
     <button class="pop-close" data-action="close-overlay" aria-label="Fermer">×</button>
     <h3 id="moods-title">Quelle est ton humeur ?</h3>
-    <p class="sheet-sub">Choisis une envie, on te trouve les capsules qui vont avec.</p>
+    <p class="sheet-sub">Choisis une envie, on te trouve les capsules qui vont avec !</p>
     <div class="moods">${tiles}</div>
     <button class="btn secondary" data-action="mood-random">🎲 Surprends-moi complètement</button>
   </div>`, 'bottom');
@@ -278,7 +291,7 @@ function renderMood() {
   const tabs = [['all', 'Tous'], ['original', 'Original'], ['vertuo', 'Vertuo']]
     .map(([k, n]) => `<button class="${MOOD.system === k ? 'on' : ''}" data-msys="${k}">${n}</button>`).join('');
   box.innerHTML = `<div class="mood-hero" style="--c1:${m.c[0]};--c2:${m.c[1]}">
-      <span class="mood-emoji big" aria-hidden="true">${m.emoji}</span>
+      ${moodIcon(m, 'big')}
       <h1>${esc(m.name)}</h1><p>${esc(m.line)}</p>
       <div class="mood-cta"><button class="pill" data-action="mood-surprise">🎲 Surprends-moi</button><button class="pill ghost" data-action="open-moods">Changer d’humeur</button></div>
     </div>
@@ -404,6 +417,8 @@ function render() {
   // Bulle de profil en haut à droite de l'accueil : ma photo (ou initiale), sinon une silhouette (connexion).
   $('home-avatar').innerHTML = S.profile?.username ? avatarHTML(S.profile)
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  { const h = new Date().getHours(); const n = S.profile?.username;
+    $('home-hello-name').textContent = `${h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour'}${n ? ' ' + n : ''},`; }
   $('home-avatar').setAttribute('aria-label', S.profile?.username ? `Mon profil (${S.profile.username})` : 'Se connecter');
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
 }
