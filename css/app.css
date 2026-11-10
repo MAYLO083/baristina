@@ -350,3 +350,93 @@ body.locked { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ================================================================ notification d'accueil */
+.welcome { position: fixed; top: calc(8px + env(safe-area-inset-top)); left: 50%; z-index: 300; width: calc(100% - 16px); max-width: 414px;
+  display: flex; align-items: center; gap: 11px; padding: 11px 13px 13px; overflow: hidden; border-radius: 22px; cursor: pointer;
+  background: #fffaf1e0; backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: 0 12px 34px #1c140f40, inset 0 0 0 1px #ffffff90; transform: translate(-50%, -140%); opacity: .4; touch-action: none; }
+.welcome.show { transform: translate(-50%, 0); opacity: 1; transition: transform .7s cubic-bezier(.18, 1.35, .35, 1), opacity .3s; }
+.welcome.hide { transform: translate(-50%, -140%); opacity: 0; transition: transform .4s cubic-bezier(.5, 0, .75, 0), opacity .4s; }
+.w-icon { flex: none; width: 42px; height: 42px; border-radius: 11px; box-shadow: 0 2px 6px #0002; }
+.welcome.show .w-icon { animation: w-icon .9s .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+.w-body { flex: 1; min-width: 0; }
+.w-top { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; letter-spacing: .05em; color: var(--muted); }
+.w-body b { display: block; margin-top: 2px; font-size: 15px; color: var(--ink); }
+.w-body p { margin: 1px 0 0; font-size: 13px; line-height: 1.35; color: #3b332c; }
+.welcome.show .w-body b, .welcome.show .w-body p { animation: w-text .5s cubic-bezier(.2, .9, .3, 1) both; }
+.welcome.show .w-body b { animation-delay: .3s; } .welcome.show .w-body p { animation-delay: .42s; }
+.w-bar { position: absolute; left: 14px; right: 14px; bottom: 5px; height: 3px; border-radius: 3px; background: var(--terracotta); opacity: .55; transform-origin: left; transform: scaleX(0); }
+.welcome.show .w-bar { animation: w-bar 5.5s linear both; }
+@keyframes w-icon { 0% { transform: scale(.4) rotate(-25deg); } 60% { transform: scale(1.12) rotate(8deg); } 100% { transform: none; } }
+@keyframes w-text { from { opacity: 0; transform: translateY(6px); } }
+@keyframes w-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ================================================================ sélecteur d'affichage */
+.list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.list-head .result-count { margin: 0; }
+.view-switch { --i: 0; position: relative; flex: none; display: grid; grid-template-columns: repeat(5, 34px); padding: 3px; border-radius: 12px; background: var(--cream); }
+.vs-ind { position: absolute; top: 3px; left: 3px; width: 34px; height: 30px; border-radius: 9px; background: var(--white); box-shadow: 0 2px 6px #3e2a2422;
+  transform: translateX(calc(var(--i) * 34px)); transition: transform .5s cubic-bezier(.2, 1.45, .4, 1); }
+.view-switch button { position: relative; z-index: 1; height: 30px; padding: 0; border: 0; background: none; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: color .25s, transform .3s cubic-bezier(.2, 1.6, .4, 1); }
+.view-switch button:active { transform: scale(.85); }
+.view-switch button.on { color: var(--green); }
+.view-switch button.on svg { animation: nav-bounce .55s cubic-bezier(.2, 1.8, .4, 1); }
+.view-switch svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+::view-transition-old(root) { animation: vt-out .18s ease both; }
+::view-transition-new(root) { animation: vt-in .3s ease both; }
+@keyframes vt-out { to { opacity: 0; } } @keyframes vt-in { from { opacity: 0; } }
+
+/* ================================================================ les 5 affichages */
+.card .aro { display: none; }
+.products .items { margin: 0; }
+
+/* 2. Compacte : beaucoup de capsules d'un coup d'œil */
+.view-compact .card { margin: 5px 0; padding: 7px 10px; gap: 10px; border-radius: 12px; }
+.view-compact .capsule { flex: 0 0 38px; width: 38px; height: 34px; }
+.view-compact .shell { width: 26px; height: 23px; }
+.view-compact .capsule .brand-tag { display: none; }
+.view-compact .card strong { font-size: 14px; }
+.view-compact .card .sub { margin-top: 1px; font-size: 11px; }
+.view-compact .int-ring { width: 30px; height: 30px; } .view-compact .int-ring b { font-size: 11px; } .view-compact .int-ring small { display: none; }
+
+/* 3. Grille : deux colonnes de tuiles */
+.view-grid .items { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 4px; }
+.view-grid .card, .view-carousel .card { position: relative; margin: 0; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 14px 10px 12px; border-radius: 18px;
+  background: linear-gradient(170deg, color-mix(in srgb, var(--cap) 16%, var(--white)), var(--white) 62%); }
+.view-grid .capsule { width: 100%; height: 100px; flex: none; }
+.view-grid .shell, .view-carousel .shell { width: 58px; height: 50px; }
+.view-grid .meta, .view-carousel .meta { width: 100%; }
+.view-grid .card strong { font-size: 14px; }
+.view-grid .int-ring, .view-carousel .int-ring { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; }
+.view-grid .int-ring b, .view-carousel .int-ring b { font-size: 12px; } .view-grid .int-ring small, .view-carousel .int-ring small { display: none; }
+.view-grid .qty, .view-carousel .qty, .view-showcase .qty { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 10px; background: var(--white); box-shadow: 0 1px 4px #0001; }
+.view-grid .card:active .capsule, .view-carousel .card:active .capsule { transform: scale(1.06) rotate(-3deg); }
+.view-grid .capsule, .view-carousel .capsule, .view-showcase .capsule { transition: transform .4s cubic-bezier(.2, 1.6, .4, 1); }
+
+/* 4. Vitrine : grandes fiches avec la couleur de la capsule */
+.view-showcase .card { position: relative; flex-direction: column; align-items: stretch; gap: 0; margin: 14px 0; padding: 0; overflow: hidden; border-radius: 22px; box-shadow: 0 10px 24px #3e2a241c; }
+.view-showcase .capsule { width: 100%; height: 190px; flex: none;
+  background: radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--cap) 30%, var(--white)) 0 32%, color-mix(in srgb, var(--cap) 75%, #1c140f)); }
+.view-showcase .capsule img { width: 150px; height: 150px; border-radius: 18px; box-shadow: 0 12px 26px #0005; }
+.view-showcase .shell { width: 96px; height: 84px; }
+.view-showcase .capsule .brand-tag { bottom: 12px; font-size: 11px; }
+.view-showcase .meta { padding: 14px 16px 16px; }
+.view-showcase .card strong { font-size: 19px; }
+.view-showcase .card .sub { font-size: 12.5px; }
+.view-showcase .aro { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.view-showcase .aro i { padding: 3px 9px; border-radius: 10px; background: var(--cream); font-size: 11px; font-style: normal; }
+.view-showcase .int-ring { position: absolute; top: 12px; right: 12px; width: 52px; height: 52px; box-shadow: 0 4px 12px #0003; }
+.view-showcase .int-ring b { font-size: 17px; }
+.entering .view-showcase .capsule img, .entering .view-showcase .shell { animation: float-in .8s cubic-bezier(.2, 1.3, .4, 1) both; }
+@keyframes float-in { from { opacity: 0; transform: translateY(24px) scale(.85) rotate(-6deg); } }
+
+/* 5. Carrousel : une rangée qui défile par gamme */
+.view-carousel .items { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 4px -18px 2px; padding: 4px 18px 14px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.view-carousel .items::-webkit-scrollbar { display: none; }
+.view-carousel .card { flex: 0 0 140px; scroll-snap-align: start; scroll-margin-left: 18px; }
+.view-carousel .capsule { width: 100%; height: 92px; flex: none; }
+.view-carousel .card strong { font-size: 13px; }
+.view-carousel .card .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.entering .view-carousel .card { animation-name: slide-x; }
+@keyframes slide-x { from { opacity: 0; transform: translateX(40px) scale(.95); } }

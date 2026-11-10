@@ -53,7 +53,7 @@
         </div>
         <button class="link-btn" data-action="reset-filters">Réinitialiser les filtres</button>
       </div>
-      <p id="result-count" class="result-count"></p>
+      <div class="list-head"><p id="result-count" class="result-count"></p><div id="view-switch-cat"></div></div>
       <div id="catalog-list"><div class="loading">Chargement du catalogue…</div></div>
     </div>
   </section>
@@ -118,6 +118,7 @@
     <a href="#/scanner" data-nav="scan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Scanner</a>
     <a href="#/compte" data-nav="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Compte</a>
   </nav>
+  <div id="welcome" class="welcome" role="status" aria-live="polite" hidden></div>
   <div id="overlay" class="overlay" hidden></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </main>

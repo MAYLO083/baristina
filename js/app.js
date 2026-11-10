@@ -1,6 +1,6 @@
 // Baristina V1 — application (catalogue, fiches, scanner, collection, compte).
 // Toutes les données passent par Supabase : rien n'est stocké sur l'appareil,
-// à part la session de connexion gérée par Supabase.
+// à part la session de connexion gérée par Supabase et le choix d'affichage des listes.
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 import { identify } from './scan.js';
@@ -260,6 +260,14 @@ function openMoods() {
     <button class="btn secondary" data-action="mood-random">🎲 Surprends-moi complètement</button>
   </div>`, 'bottom');
 }
+// En carrousel : une rangée par marque ; sinon la liste suit l'ordre de pertinence.
+function moodItemsHTML(list) {
+  if (VIEW !== 'carousel') return `<div class="items">${list.map(cardHTML).join('')}</div>`;
+  return [...S.brands.values()].map((b) => {
+    const items = list.filter((p) => p.brand_id === b.id);
+    return items.length ? `<h3 class="group-title">${esc(b.name)} <small>· ${items.length}</small></h3><div class="items">${items.map(cardHTML).join('')}</div>` : '';
+  }).join('');
+}
 function renderMood() {
   const box = $('mood-content');
   const m = MOODS.find((x) => x.id === MOOD.id);
@@ -276,9 +284,90 @@ function renderMood() {
     </div>
     <div class="content">
       <div class="tabs three">${tabs}</div>
-      <p class="result-count">${list.length} capsule${list.length > 1 ? 's' : ''} pour cette humeur</p>
-      <div class="mood-list">${list.length ? list.map(cardHTML).join('') : '<div class="empty">Aucune capsule de ce format pour cette humeur.</div>'}</div>
+      <div class="list-head"><p class="result-count">${list.length} capsule${list.length > 1 ? 's' : ''} pour cette humeur</p>${viewSwitchHTML()}</div>
+      <div class="mood-list products view-${VIEW}">${list.length ? moodItemsHTML(list) : '<div class="empty">Aucune capsule de ce format pour cette humeur.</div>'}</div>
     </div>`;
+}
+
+// ---------------------------------------------------------------- notification d'accueil (à chaque lancement)
+const WELCOME = [
+  'Prête ou prêt pour ta première capsule de la journée ?', 'Ta collection t’attend, elle a hâte de te revoir.',
+  'Ristretto, lungo… ou une nouvelle découverte aujourd’hui ?', 'Pas d’idée ? Laisse ton humeur choisir ta prochaine capsule.',
+  'Scanne une capsule et découvre tout ce qu’elle cache.', 'Plus de 180 capsules t’attendent dans le catalogue.',
+  'Le café est prêt quand tu l’es.', 'Envie de douceur ou besoin d’un coup de boost ?',
+  'Une capsule goûtée, c’est une note de dégustation à partager.', 'Et si tu testais une intensité que tu n’as jamais essayée ?',
+  'Les membres partagent leurs coups de cœur : va jeter un œil !', 'Qui sera la star de ta collection aujourd’hui ?',
+  'Un bon café, et la journée commence déjà mieux.', 'Ta machine chauffe, ton catalogue aussi.',
+  'Original ou Vertuo ? Il y en a pour toutes les machines.', 'Note tes capsules préférées pour ne jamais les oublier.',
+  'Petite pause café ? On t’a gardé une place au comptoir.', 'Arabica, robusta, aromatisé… qu’est-ce qui te tente ?',
+  'Chaque capsule a son histoire, à toi de la découvrir.', 'L’odeur du café n’attend plus que toi.',
+  'Une tasse, un instant, rien que pour toi.', 'Ta prochaine capsule préférée est peut-être à un scan près.',
+  'Colombie, Éthiopie, Inde… fais le tour du monde en quelques capsules.', 'Aujourd’hui, on ose une édition limitée ?',
+  'Partage tes notes de dégustation avec la communauté Baristina.', 'Plutôt mousse de lait ou espresso bien serré aujourd’hui ?',
+  'Un café, ça se savoure… et ça se collectionne.', 'Chaque capsule ajoutée fait grandir ta collection, continue !',
+  'Le meilleur moment de la journée ? Celui de la capsule.', 'Bienvenue au comptoir Baristina, installe-toi.',
+];
+let welcomed = false, welcomeTimer;
+function showWelcome() {
+  if (welcomed) return; welcomed = true;
+  const h = new Date().getHours();
+  const hello = h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour';
+  const name = S.profile?.username;
+  const w = $('welcome');
+  w.innerHTML = `<img src="apple-touch-icon.png" alt="" class="w-icon">
+    <div class="w-body"><div class="w-top"><span>BARISTINA</span><span>maintenant</span></div>
+    <b>${hello}${name ? ' ' + esc(name) : ''} ☕</b><p>${esc(WELCOME[Math.floor(Math.random() * WELCOME.length)])}</p></div>
+    <span class="w-bar" aria-hidden="true"></span>`;
+  w.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('show')));
+  welcomeTimer = setTimeout(hideWelcome, 5500);
+}
+function hideWelcome() {
+  const w = $('welcome'); clearTimeout(welcomeTimer);
+  if (w.hidden || !w.classList.contains('show')) return;
+  w.classList.remove('show'); w.classList.add('hide');
+  setTimeout(() => { w.hidden = true; w.classList.remove('hide'); w.style.transform = ''; }, 450);
+}
+// Toucher pour fermer, ou glisser vers le haut comme une vraie notification.
+{
+  const w = $('welcome'); let y0 = null;
+  w.addEventListener('click', hideWelcome);
+  w.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; clearTimeout(welcomeTimer); }, { passive: true });
+  w.addEventListener('touchmove', (e) => { if (y0 == null) return; const d = Math.min(0, e.touches[0].clientY - y0); w.style.transform = `translate(-50%, ${d}px)`; }, { passive: true });
+  w.addEventListener('touchend', (e) => {
+    const d = (e.changedTouches[0]?.clientY ?? y0) - y0; y0 = null; w.style.transform = '';
+    if (d < -25) hideWelcome(); else welcomeTimer = setTimeout(hideWelcome, 2500);
+  });
+}
+
+// ---------------------------------------------------------------- affichage des listes : 5 formes
+// Le choix est mémorisé sur l'appareil (simple préférence d'affichage, aucune donnée personnelle).
+const VIEWS = [
+  ['list', 'Liste', '<path d="M4 6h16M4 12h16M4 18h16"/>'],
+  ['compact', 'Compacte', '<path d="M4 5h16M4 9.5h16M4 14h16M4 18.5h16"/>'],
+  ['grid', 'Grille', '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'],
+  ['showcase', 'Vitrine', '<rect x="4" y="3.5" width="16" height="12" rx="2"/><path d="M4 19h16"/>'],
+  ['carousel', 'Carrousel', '<rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 7v10M21 7v10"/>'],
+];
+let VIEW = (() => { try { const v = localStorage.getItem('baristina-view'); return VIEWS.some(([k]) => k === v) ? v : 'list'; } catch { return 'list'; } })();
+function viewSwitchHTML() {
+  const i = VIEWS.findIndex(([k]) => k === VIEW);
+  return `<div class="view-switch" style="--i:${i}" role="radiogroup" aria-label="Affichage"><span class="vs-ind" aria-hidden="true"></span>${VIEWS.map(([k, n, svg]) =>
+    `<button class="${k === VIEW ? 'on' : ''}" data-view="${k}" role="radio" aria-checked="${k === VIEW}" aria-label="Affichage ${n}" title="${n}"><svg viewBox="0 0 24 24">${svg}</svg></button>`).join('')}</div>`;
+}
+const viewName = () => VIEWS.find(([k]) => k === VIEW)[1];
+function setView(v) {
+  if (v === VIEW) return;
+  VIEW = v; try { localStorage.setItem('baristina-view', v); } catch {}
+  const i = VIEWS.findIndex(([k]) => k === v);
+  // l'indicateur glisse d'abord, puis les cartes se réorganisent
+  document.querySelectorAll('.view-switch').forEach((el) => {
+    el.style.setProperty('--i', i);
+    el.querySelectorAll('[data-view]').forEach((b) => { b.classList.toggle('on', b.dataset.view === v); b.setAttribute('aria-checked', b.dataset.view === v); });
+  });
+  const update = () => { document.body.classList.add('entering'); clearTimeout(show.t); show.t = setTimeout(() => document.body.classList.remove('entering'), 900); render(); };
+  setTimeout(() => (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches ? document.startViewTransition(update) : update()), 120);
+  toast(`Affichage ${viewName()}`);
 }
 
 // ---------------------------------------------------------------- navigation
@@ -342,7 +431,8 @@ function filtered() {
 function cardHTML(p) {
   const item = S.collection.get(p.id);
   const tags = [p.system === 'vertuo' ? 'Vertuo' : null, p.decaf ? 'Déca' : null, p.flavoured ? 'Aromatisé' : null, p.organic ? 'Bio' : null, p.limited ? 'Édition limitée' : null].filter(Boolean);
-  return `<a class="card" href="#/capsule/${encodeURIComponent(p.id)}">${capsuleHTML(p)}<div class="meta"><strong>${esc(p.name)}</strong><span class="sub">${esc(brandName(p))}${tags.length ? ' · ' + esc(tags.join(' · ')) : ''}</span></div>${intensityRing(p)}${item ? `<span class="qty">×${item.quantity}</span>` : ''}</a>`;
+  const aro = p.aromas?.length ? `<span class="aro">${p.aromas.slice(0, 3).map((a) => `<i>${esc(a)}</i>`).join('')}</span>` : '';
+  return `<a class="card" style="--cap:${capColor(p)}" href="#/capsule/${encodeURIComponent(p.id)}">${capsuleHTML(p)}<div class="meta"><strong>${esc(p.name)}</strong><span class="sub">${esc(brandName(p))}${tags.length ? ' · ' + esc(tags.join(' · ')) : ''}</span>${aro}</div>${intensityRing(p)}${item ? `<span class="qty">×${item.quantity}</span>` : ''}</a>`;
 }
 function renderFilterControls() {
   const f = S.filters;
@@ -364,6 +454,8 @@ function renderCatalog() {
   renderFilterControls();
   const list = filtered();
   $('result-count').textContent = `${list.length} capsule${list.length > 1 ? 's' : ''}`;
+  $('view-switch-cat').innerHTML = viewSwitchHTML();
+  $('catalog-list').className = 'products view-' + VIEW;
   if (!list.length) { $('catalog-list').innerHTML = '<div class="empty">Aucune capsule ne correspond à ces critères.</div>'; return; }
   let html = '';
   for (const brand of S.brands.values()) {
@@ -376,9 +468,9 @@ function renderCatalog() {
       const ranges = [...new Set(items.map(key))].sort((a, b) => a.startsWith('Vertuo') - b.startsWith('Vertuo') || a.localeCompare(b, 'fr'));
       for (const r of ranges) {
         if (ranges.length > 1) html += `<div class="range-title">${esc(r)}</div>`;
-        html += items.filter((p) => key(p) === r).map(cardHTML).join('');
+        html += `<div class="items">${items.filter((p) => key(p) === r).map(cardHTML).join('')}</div>`;
       }
-    } else html += items.map(cardHTML).join('');
+    } else html += `<div class="items">${items.map(cardHTML).join('')}</div>`;
   }
   $('catalog-list').innerHTML = html;
 }
@@ -717,6 +809,8 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- actions (délégation : pas de JS inline)
 document.addEventListener('click', async (e) => {
+  const vbtn = e.target.closest('[data-view]');
+  if (vbtn) { setView(vbtn.dataset.view); return; }
   const msys = e.target.closest('[data-msys]');
   if (msys) { MOOD.system = msys.dataset.msys; renderMood(); return; }
   const sysTab = e.target.closest('[data-system]');
@@ -903,13 +997,14 @@ async function onSession(session) {
   if (uid === (S.user?.id ?? null) && S.profileLoaded) return;
   S.user = session?.user ?? null;
   await loadUserData(); S.profileLoaded = true;
+  setTimeout(showWelcome, 500);
   if (S.user && !S.profile?.username && S.screen !== 'account') location.hash = '#/compte'; // pseudo obligatoire
   if (location.hash.startsWith('#/compte')) route(); else render(); // « Compte » : profil ou connexion selon la session
   if (S.screen === 'scan' && $('photo-preview').hidden) resetScan();
 }
 async function start() {
   route();
-  if (!CONFIGURED) return;
+  if (!CONFIGURED) { setTimeout(showWelcome, 700); return; }
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') { S.recovery = true; location.hash = '#/compte'; }
     setTimeout(() => onSession(session), 0); // ne pas appeler Supabase dans le rappel lui-même
