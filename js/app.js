@@ -419,8 +419,6 @@ function render() {
   // Bulle de profil en haut à droite de l'accueil : ma photo (ou initiale), sinon une silhouette (connexion).
   $('home-avatar').innerHTML = S.profile?.username ? avatarHTML(S.profile)
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
-  { const h = new Date().getHours(); const n = S.profile?.username;
-    $('home-hello-name').textContent = `${h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour'}${n ? ' ' + n : ''},`; }
   $('home-avatar').setAttribute('aria-label', S.profile?.username ? `Mon profil (${S.profile.username})` : 'Se connecter');
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
 }
