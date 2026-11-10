@@ -256,14 +256,16 @@ const MOOD_ICONS = {
   soiree: '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.3 6.3 0 0 0 10 10z"/><path d="M17 3.5v3M15.5 5h3"/>',
 };
 const moodIcon = (m, cls = '') => `<svg class="mood-ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${MOOD_ICONS[m.id] ?? ''}</svg>`;
+// Photo d'ambiance (chemin absolu : une url() dans une variable CSS se lit depuis la feuille de style)
+const moodImg = (m) => new URL(`img/mood-${m.id}.jpg`, document.baseURI).href;
 const MOOD = { id: null, system: 'all' };
 function moodList(m) {
   return S.products.map((p) => [p, m.score(p)]).filter(([, s]) => s >= (m.min ?? 1))
     .sort((a, b) => b[1] - a[1] || a[0].name.localeCompare(b[0].name, 'fr')).map(([p]) => p);
 }
 function openMoods() {
-  const tiles = MOODS.map((m, i) => `<a class="mood" href="#/humeur/${m.id}" data-action="close-overlay" style="--c1:${m.c[0]};--c2:${m.c[1]};--d:${i}">
-      ${moodIcon(m)}<span class="mood-txt"><b>${esc(m.name)}</b><small>${esc(m.line)}</small></span>${moodIcon(m, 'ghost')}</a>`).join('');
+  const tiles = MOODS.map((m, i) => `<a class="mood" href="#/humeur/${m.id}" data-action="close-overlay" style="--c1:${m.c[0]};--c2:${m.c[1]};--d:${i};--img:url(${moodImg(m)})">
+      ${moodIcon(m)}<span class="mood-txt"><b>${esc(m.name)}</b><small>${esc(m.line)}</small></span></a>`).join('');
   openOverlay(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="moods-title">
     <div class="sheet-grip" aria-hidden="true"></div>
     <button class="pop-close" data-action="close-overlay" aria-label="Fermer">×</button>
@@ -290,7 +292,7 @@ function renderMood() {
   const list = all.filter((p) => MOOD.system === 'all' || p.system === MOOD.system);
   const tabs = [['all', 'Tous'], ['original', 'Original'], ['vertuo', 'Vertuo']]
     .map(([k, n]) => `<button class="${MOOD.system === k ? 'on' : ''}" data-msys="${k}">${n}</button>`).join('');
-  box.innerHTML = `<div class="mood-hero" style="--c1:${m.c[0]};--c2:${m.c[1]}">
+  box.innerHTML = `<div class="mood-hero" style="--c1:${m.c[0]};--c2:${m.c[1]};--img:url(${moodImg(m)})">
       ${moodIcon(m, 'big')}
       <h1>${esc(m.name)}</h1><p>${esc(m.line)}</p>
       <div class="mood-cta"><button class="pill" data-action="mood-surprise">🎲 Surprends-moi</button><button class="pill ghost" data-action="open-moods">Changer d’humeur</button></div>
