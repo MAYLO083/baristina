@@ -440,3 +440,8 @@ body.locked { overflow: hidden; }
 .view-carousel .card .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .entering .view-carousel .card { animation-name: slide-x; }
 @keyframes slide-x { from { opacity: 0; transform: translateX(40px) scale(.95); } }
+
+/* Accueil : pas d'espace vide en bas (le menu du bas y est masqué) */
+#screen-home.active { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; padding-bottom: 0; }
+#screen-home .home-actions { flex: 1; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+#screen-home .disclaimer { margin-top: 6px; font-size: 9.5px; line-height: 1.35; opacity: .8; }
