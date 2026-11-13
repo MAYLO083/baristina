@@ -419,6 +419,15 @@ function render() {
   const h = new Date().getHours(), name = S.profile?.username;
   $('hn-title').textContent = `${h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour'}${name ? ' ' + name : ''} ☕`;
   $('hn-msg').textContent = HOME_MSG;
+  // Icône de la notification : la photo de profil si connecté, sinon la dosette dessinée.
+  const ic = document.querySelector('.hn-icon');
+  ic.dataset.caps ??= ic.innerHTML;
+  const key = name ? name + '|' + (avatarURL(S.profile) ?? '') : '';
+  if (ic.dataset.key !== key) {
+    ic.dataset.key = key;
+    ic.classList.toggle('is-avatar', !!name);
+    ic.innerHTML = name ? avatarHTML(S.profile) : ic.dataset.caps;
+  }
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
 }
 window.addEventListener('hashchange', route);
