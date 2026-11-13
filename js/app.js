@@ -379,7 +379,7 @@ function setView(v) {
     el.querySelectorAll('[data-view]').forEach((b) => { b.classList.toggle('on', b.dataset.view === v); b.setAttribute('aria-checked', b.dataset.view === v); });
   });
   const update = () => { document.body.classList.add('entering'); clearTimeout(show.t); show.t = setTimeout(() => document.body.classList.remove('entering'), 900); render(); };
-  setTimeout(() => (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches ? document.startViewTransition(update) : update()), 120);
+  setTimeout(() => (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches ? document.startViewTransition(update).ready.catch(() => {}) : update()), 120);
   toast(`Affichage ${viewName()}`);
 }
 
@@ -411,6 +411,7 @@ function show(name) {
   document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('active', a.dataset.nav === navKey));
   render();
   window.scrollTo(0, name === 'catalog' ? S.catalogScroll : 0);
+  calmOffscreen(); // recalcul après le retour à la position de défilement
   if (name === 'scan') resetScan();
 }
 function render() {
@@ -429,6 +430,17 @@ function render() {
     ic.innerHTML = name ? avatarHTML(S.profile) : ic.dataset.caps;
   }
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
+  calmOffscreen();
+}
+// Les animations d'apparition ne concernent que ce qui est à l'écran : animer les 184 cartes (et leur
+// anneau d'intensité, redessiné à chaque image) d'un coup faisait ramer le téléphone.
+function calmOffscreen() {
+  if (!document.body.classList.contains('entering')) return;
+  const limit = window.innerHeight * 1.1;
+  for (const el of document.querySelectorAll('.screen.active .card, .screen.active .member')) {
+    const r = el.getBoundingClientRect();
+    el.classList.toggle('still', r.top > limit || r.bottom < 0);
+  }
 }
 window.addEventListener('hashchange', route);
 
