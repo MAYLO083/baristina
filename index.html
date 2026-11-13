@@ -22,7 +22,18 @@
       <button class="home-menu" data-action="open-menu" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></button>
     </header>
     <div class="home-notif" role="status">
-      <span class="hn-icon"><img src="apple-touch-icon.png" alt=""></span>
+      <span class="hn-icon" aria-hidden="true"><svg viewBox="0 0 44 44">
+        <defs><linearGradient id="hn-caps" x1="0" x2="1"><stop offset="0" stop-color="#8a5a3b"/><stop offset=".45" stop-color="#d9a066"/><stop offset="1" stop-color="#7a4a2c"/></linearGradient></defs>
+        <g class="hn-caps"><g transform="rotate(-14 22 23)">
+          <rect x="9" y="29" width="26" height="4" rx="2" fill="#f1e0ce"/>
+          <path d="M12 29.5 15.6 14.5Q22 12 28.4 14.5L32 29.5Z" fill="url(#hn-caps)"/>
+          <ellipse cx="22" cy="14.3" rx="6.4" ry="1.9" fill="#e9c08f"/>
+          <path d="M17.6 17.5 15.2 28" stroke="#ffffff73" stroke-width="1.4" stroke-linecap="round"/>
+          <ellipse cx="23" cy="22.4" rx="2.6" ry="3.6" fill="#321f11"/>
+          <path d="M23.9 19.2c-1.6 1.6-.2 4.6-1.8 6.4" stroke="#d9a066" stroke-width=".8" fill="none" stroke-linecap="round"/>
+        </g></g>
+        <circle class="hn-spark" cx="34.5" cy="10" r="1.6" fill="#f1e0ce"/><circle class="hn-spark s2" cx="9" cy="13" r="1.1" fill="#f1e0ce"/>
+      </svg></span>
       <div class="hn-body"><div class="hn-top"><span>BARISTINA</span><span class="hn-dot" aria-hidden="true"></span><span>maintenant</span></div>
         <b id="hn-title"></b><p id="hn-msg"></p></div>
     </div>

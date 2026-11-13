@@ -604,3 +604,13 @@ h1, h2, h3 { font-weight: 400; }
 @keyframes trivia-flip { 0% { transform: none; } 45% { transform: perspective(700px) rotateX(85deg); opacity: .4; } 55% { transform: perspective(700px) rotateX(-85deg); opacity: .4; } 100% { transform: none; } }
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .home-notif, .home-notif::after, .hn-dot, .trivia, .trivia::before, .trivia-cup .steam, .trivia-text span { animation: none !important; } }
+
+/* icône de la notification : une dosette dessinée (le logo est déjà en grand au-dessus) */
+.hn-icon { background: radial-gradient(circle at 30% 20%, #5b4434, var(--marron) 70%); }
+.hn-icon svg { width: 100%; height: 100%; display: block; }
+.hn-caps { transform-box: fill-box; transform-origin: 50% 90%; animation: caps-sway 3.2s 1.4s ease-in-out infinite; }
+.hn-spark { animation: spark 2.4s 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.hn-spark.s2 { animation-delay: 2.2s; }
+@keyframes caps-sway { 0%, 100% { rotate: 0deg; } 50% { rotate: 8deg; } }
+@keyframes spark { 0%, 100% { opacity: 0; scale: .3; } 50% { opacity: 1; scale: 1; } }
+@media (prefers-reduced-motion: reduce) { .hn-caps, .hn-spark { animation: none !important; } }
