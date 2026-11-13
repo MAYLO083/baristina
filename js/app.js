@@ -222,25 +222,25 @@ const has = (p, re) => re.test(txt(p));
 const cups = (p, re) => (p.cup_sizes ?? []).some((c) => re.test(c));
 const ITALIAN = new Set(['lavazza', 'kimbo', 'borbone', 'segafredo', 'illy']);
 const MOODS = [
-  { id: 'douceur', emoji: '☁️', name: 'Tout en douceur', line: 'Rond, léger, sans amertume : pour commencer en douceur.', c: ['#b08460', '#d4ae86'],
+  { id: 'douceur', emoji: '☁️', name: 'Tout en douceur', line: 'Rond, léger, sans amertume. Pour bien démarrer la journée.', c: ['#b08460', '#d4ae86'],
     score: (p) => (p.intensity >= 9 ? -9 : 0) + (p.intensity && p.intensity <= 6 ? 2 : 0) + (has(p, /doux|rond|velout|delicat|biscuit|cereales douces|lacte|cremeux|miel|leger|torrefaction legere/) ? 1 : 0) + (p.roast === 'blonde' ? 1 : 0) },
-  { id: 'energie', emoji: '⚡', name: 'Coup de boost', line: 'Réveil difficile ? Du corsé, du caractère, du punch.', c: ['#76202a', '#c4513f'],
+  { id: 'energie', emoji: '⚡', name: 'Coup de boost', line: 'Corsé, intense, plein de caractère. Pour les réveils difficiles.', c: ['#76202a', '#c4513f'],
     score: (p) => (p.decaf ? -9 : 0) + (p.intensity >= 10 ? 2 : 0) + (p.intensity >= 12 ? 1 : 0) + (has(p, /intense|corse|robusta|robuste|ginseng|intensement|torrefaction intense|caf(e|ei)ne/) ? 1 : 0) + (/coffee\+|double espresso/i.test(p.range ?? '') ? 1 : 0) + (p.roast === 'dark' ? 1 : 0) },
-  { id: 'gourmand', emoji: '🍫', name: 'Gourmandise', line: 'Caramel, chocolat, vanille… une envie sucrée sans le sucre.', c: ['#8a5a3b', '#d9a066'],
+  { id: 'gourmand', emoji: '🍫', name: 'Gourmandise', line: 'Caramel, chocolat, vanille. Pour céder à la tentation.', c: ['#8a5a3b', '#d9a066'],
     score: (p) => (p.flavoured ? 2 : 0) + (has(p, /caramel|chocolat|vanill|noisette|biscuit|brownie|cheesecake|miel|amande|cacao|praline/) ? 1 : 0) },
-  { id: 'cocooning', emoji: '🧣', name: 'Cocooning', line: 'Plaid, pluie qui tombe et grande tasse entre les mains.', c: ['#3e2a24', '#a0705a'], min: 2,
+  { id: 'cocooning', emoji: '🧣', name: 'Cocooning', line: 'Chaud, enveloppant, réconfortant. Pour les jours de pluie, sous un plaid.', c: ['#3e2a24', '#a0705a'], min: 2,
     score: (p) => (has(p, /cacao|chocolat|biscuit|cereales grillees|caramel|pain grille|malt|noisette|miel|fruits secs|cremeux|velout/) ? 1 : 0) + (cups(p, /lungo|mug|lait|cappuccino/i) ? 1 : 0) + (p.intensity >= 5 && p.intensity <= 9 ? 1 : 0) },
-  { id: 'hiver', emoji: '❄️', name: 'Esprit d’hiver', line: 'Épices, bois et feu de cheminée : la saison froide en tasse.', c: ['#2f4a5c', '#8fa9b8'],
+  { id: 'hiver', emoji: '❄️', name: 'Esprit d’hiver', line: 'Épicé, boisé, chaleureux. Pour se réchauffer quand il fait froid.', c: ['#2f4a5c', '#8fa9b8'],
     score: (p) => (has(p, /epic|epice|citrouille|pumpkin|chataigne|boise|fume|chene|cannelle|spice|hiver|winter|noel/) ? 2 : 0) + (has(p, /grille|cacao|torrefaction intense/) ? 1 : 0) + (p.intensity >= 8 ? 1 : 0) + (p.limited ? 1 : 0), min: 3 },
-  { id: 'soleil', emoji: '☀️', name: 'Rayon de soleil', line: 'Fruité, floral, lumineux… ou carrément glacé.', c: ['#c77651', '#f0c27a'], min: 2,
+  { id: 'soleil', emoji: '☀️', name: 'Rayon de soleil', line: 'Fruité, floral, lumineux. Pour égayer la journée, chaud ou glacé.', c: ['#c77651', '#f0c27a'], min: 2,
     score: (p) => (/glac/i.test(p.highlight ?? '') ? 3 : 0) + (has(p, /fruit|agrume|citri|floral|fleur|jasmin|yuzu|baie|myrtille|acidit|tropical|coco|hibiscus/) ? 2 : 0) + (p.intensity && p.intensity <= 6 ? 1 : 0) },
-  { id: 'evasion', emoji: '🌍', name: 'Évasion', line: 'Un aller simple vers les plantations du bout du monde.', c: ['#1e5b45', '#6e8a6b'],
+  { id: 'evasion', emoji: '🌍', name: 'Évasion', line: 'Exotique, intense, aux notes venues de loin. Pour voyager sans quitter la maison.', c: ['#1e5b45', '#6e8a6b'],
     score: (p) => (p.origin ? 2 : 0) + (/origin|exploration/i.test(p.range ?? '') ? 2 : 0) + (has(p, /tropical|coco|yuzu|kona|hawaii|colombia|ethiopia|guatemala|sumatra|peru|brasil|india/) ? 1 : 0) },
-  { id: 'dolcevita', emoji: '☕', name: 'Dolce vita', line: 'Ristretto serré au comptoir, comme à Naples ou à Rome.', c: ['#173a23', '#c6aa67'], min: 2,
+  { id: 'dolcevita', emoji: '☕', name: 'Dolce vita', line: 'Serré, court. Pour savourer un ristretto comme en Italie.', c: ['#173a23', '#c6aa67'], min: 2,
     score: (p) => (/ital|qualita|origini|respresso|napoli|roma/i.test((p.range ?? '') + ' ' + p.name) ? 2 : 0) + (ITALIAN.has(p.brand_id) ? 2 : 0) + (cups(p, /ristretto/i) ? 1 : 0) + (p.intensity >= 9 ? 1 : 0) },
-  { id: 'latte', emoji: '🥛', name: 'Pause latte', line: 'Pour mousser, napper, faire un cappuccino maison.', c: ['#8f6f52', '#c9a983'],
+  { id: 'latte', emoji: '🥛', name: 'Pause latte', line: 'Doux, crémeux, une touche de lait. Pour un cappuccino, latte et macchiato.', c: ['#8f6f52', '#c9a983'],
     score: (p) => (cups(p, /lait|cappuccino/i) ? 2 : 0) + (/lait/i.test(p.highlight ?? '') ? 2 : 0) + (/barista/i.test(p.range ?? '') ? 1 : 0) + (/bianco|oatly|latte|barista/i.test(p.name) ? 1 : 0) },
-  { id: 'soiree', emoji: '🌙', name: 'Douce soirée', line: 'Le goût du café le soir, et le sommeil en prime.', c: ['#2b2540', '#6a2b72'],
+  { id: 'soiree', emoji: '🌙', name: 'Douce soirée', line: 'Tout le goût du café, sans la caféine. Pour en profiter le soir sans troubler le sommeil.', c: ['#2b2540', '#6a2b72'],
     score: (p) => (p.decaf ? 3 : 0) + (/mi-caf/i.test(p.highlight ?? '') ? 2 : 0) },
 ];
 const MOOD_ICONS = {
@@ -263,9 +263,20 @@ function moodList(m) {
   return S.products.map((p) => [p, m.score(p)]).filter(([, s]) => s >= (m.min ?? 1))
     .sort((a, b) => b[1] - a[1] || a[0].name.localeCompare(b[0].name, 'fr')).map(([p]) => p);
 }
+function openMenu() {
+  const me = S.profile?.username;
+  const links = [['#/scanner', 'Scanner une capsule'], ['#/collection', 'Ma collection'], ['#/catalogue', 'Catalogue'], ['#/membres', 'La communauté'],
+    ['#/compte', me ? `Mon profil (${esc(me)})` : 'Se connecter']];
+  openOverlay(`<div class="sheet menu-sheet" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <button class="pop-close" data-action="close-overlay" aria-label="Fermer">×</button>
+    ${links.map(([h, n]) => `<a class="menu-link" href="${h}">${n}<span aria-hidden="true">›</span></a>`).join('')}
+    <button class="menu-link" data-action="open-moods">Une envie ? Choisis selon ton humeur<span aria-hidden="true">›</span></button>
+  </div>`, 'bottom');
+}
 function openMoods() {
   const tiles = MOODS.map((m, i) => `<a class="mood" href="#/humeur/${m.id}" data-action="close-overlay" style="--c1:${m.c[0]};--c2:${m.c[1]};--d:${i};--img:url(${moodImg(m)})">
-      ${moodIcon(m)}<span class="mood-txt"><b>${esc(m.name)}</b><small>${esc(m.line)}</small></span></a>`).join('');
+      <span class="mood-txt"><b>${esc(m.name)}</b><small>${esc(m.line)}</small></span></a>`).join('');
   openOverlay(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="moods-title">
     <div class="sheet-grip" aria-hidden="true"></div>
     <button class="pop-close" data-action="close-overlay" aria-label="Fermer">×</button>
@@ -273,7 +284,6 @@ function openMoods() {
     <p class="sheet-sub">Choisis une envie, on te trouve les capsules qui vont avec !</p>
     <div class="moods">${tiles}</div>
     <button class="mood mood-surprise" data-action="mood-random" style="--d:${MOODS.length};--img:url(${new URL('img/mood-surprise.jpg', document.baseURI).href})">
-      <svg class="mood-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M8.5 8.5h.01M15.5 8.5h.01M12 12h.01M8.5 15.5h.01M15.5 15.5h.01" stroke-width="2.6"/></svg>
       <span class="mood-txt"><b>Surprends-moi</b><small>Une humeur tirée au hasard, laisse-toi porter.</small></span></button>
   </div>`, 'bottom');
 }
@@ -324,6 +334,7 @@ const WELCOME = [
   'Un café, ça se savoure… et ça se collectionne.', 'Chaque capsule ajoutée fait grandir ta collection, continue !',
   'Le meilleur moment de la journée ? Celui de la capsule.', 'Bienvenue au comptoir Baristina, installe-toi.',
 ];
+const HOME_MSG = WELCOME[Math.floor(Math.random() * WELCOME.length)];
 let welcomed = false, welcomeTimer;
 function showWelcome() {
   if (welcomed) return; welcomed = true;
@@ -419,9 +430,9 @@ function show(name) {
 }
 function render() {
   // Bulle de profil en haut à droite de l'accueil : ma photo (ou initiale), sinon une silhouette (connexion).
-  $('home-avatar').innerHTML = S.profile?.username ? avatarHTML(S.profile)
-    : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
-  $('home-avatar').setAttribute('aria-label', S.profile?.username ? `Mon profil (${S.profile.username})` : 'Se connecter');
+  // Message d'accueil : tiré au hasard une fois par lancement, avec le pseudo si connecté.
+  const h = new Date().getHours(), name = S.profile?.username;
+  $('home-msg').textContent = `${h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour'}${name ? ' ' + name : ''} ! ${HOME_MSG}`;
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
 }
 window.addEventListener('hashchange', route);
@@ -855,6 +866,7 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'open-moods': openMoods(); break;
+    case 'open-menu': openMenu(); break;
     case 'mood-random': { const m = MOODS[Math.floor(Math.random() * MOODS.length)]; location.hash = '#/humeur/' + m.id; break; }
     case 'mood-surprise': {
       const m = MOODS.find((x) => x.id === MOOD.id); if (!m) break;

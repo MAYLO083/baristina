@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#dcccbd">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Baristina — scanner, catalogue et collection de capsules de café Nespresso Original, Vertuo et compatibles.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://www.nespresso.com https://www.lorespresso.com https://www.starbucksathome.com https://www.cartenoire.fr https://www.lavazza.fr https://www.illy.com https://www.segafredo.fr https://cdn.shopify.com; connect-src 'self' data: blob: https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co; media-src 'self' blob:; base-uri 'self'; form-action 'self'">
   <title>Baristina</title>
-  <link rel="icon" type="image/png" href="icon-512.png?v=3">
+  <link rel="icon" type="image/png" href="icon-512.png?v=4">
   <!-- Nom de fichier changé à chaque nouveau logo : Safari garde l'ancienne icône en cache sinon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="icon-180-v3.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180-v4.png">
   <link rel="stylesheet" href="css/app.css">
   <script type="module" src="js/app.js"></script>
 </head>
@@ -17,21 +17,24 @@
 <main class="app">
 
   <section id="screen-home" class="screen active">
-    <a class="home-avatar" id="home-avatar" href="#/compte" aria-label="Mon profil"></a>
-    <div class="home-visual"><img src="home-reference-clean.jpg" alt="Baristina — tasse et dosettes de café"></div>
-    <div class="home-actions">
-      <a class="action red" href="#/scanner"><span class="ico" aria-hidden="true">◎</span><span class="txt">Scanner une capsule</span><span class="arr">›</span></a>
-      <button class="action sage" data-action="open-moods"><span class="ico" aria-hidden="true">✦</span><span class="txt">Une envie ? Choisis selon ton humeur</span><span class="arr">›</span></button>
-      <a class="action terracotta" href="#/collection"><span class="ico" aria-hidden="true">♡</span><span class="txt">Ma collection</span><span class="arr">›</span></a>
-      <a class="action green" href="#/catalogue"><span class="ico" aria-hidden="true">☰</span><span class="txt">Catalogue</span><span class="arr">›</span></a>
-      <p class="disclaimer">Baristina est une application indépendante, non affiliée à Nestlé Nespresso SA ni aux autres marques citées. Les noms de produits sont des marques de leurs propriétaires respectifs.</p>
+    <header class="home-head">
+      <img class="home-logo" src="img/logo-rect.png" alt="Baristina — scannez, découvrez, savourez">
+      <button class="home-menu" data-action="open-menu" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></button>
+    </header>
+    <p class="home-msg" id="home-msg"></p>
+    <div class="home-tiles">
+      <a class="home-tile" href="#/scanner"><img src="img/home-scan.jpg" alt=""><span>Scannez une capsule</span></a>
+      <button class="home-tile" data-action="open-moods"><img src="img/home-humeur.jpg" alt=""><span>Une envie ?</span></button>
+      <a class="home-tile" href="#/collection"><img src="img/home-collection.jpg" alt=""><span>Collection privée</span></a>
+      <a class="home-tile" href="#/catalogue"><img src="img/home-catalogue.jpg" alt=""><span>Catalogue</span></a>
     </div>
+    <p class="disclaimer">Baristina est une application indépendante, sans lien avec Nestlé Nespresso SA ni avec les autres marques citées. Les noms de produits cités ne sont mentionnés qu’à titre d’information.</p>
   </section>
 
   <section id="screen-catalog" class="screen">
-    <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Catalogue</h2><button class="icon-btn" data-action="toggle-filters" aria-label="Filtres">⚙</button></header>
+    <header class="page-head"><a class="ph-back" href="#/" aria-label="Accueil">‹</a><img class="ph-circle" src="img/circle-catalogue.jpg" alt=""><h1>Catalogue</h1><p>Il y en a pour tous les goûts</p></header>
     <div class="content">
-      <input id="q" class="search" type="search" placeholder="Rechercher une capsule, une marque, un arôme…" autocomplete="off">
+      <div class="search-row"><input id="q" class="search" type="search" placeholder="Rechercher une capsule, une marque, un arôme…" autocomplete="off"><button class="filter-btn" data-action="toggle-filters" aria-label="Filtres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
       <button class="mood-banner" data-action="open-moods"><span class="mb-ico" aria-hidden="true">✦</span><span><b>Pas d’idée ?</b> Laisse-toi guider par ton humeur</span><span class="arr" aria-hidden="true">›</span></button>
       <div class="tabs three" id="system-tabs">
         <button data-system="all">Tous</button><button data-system="original">Original</button><button data-system="vertuo">Vertuo</button>
@@ -86,7 +89,7 @@
   </section>
 
   <section id="screen-collection" class="screen">
-    <div class="collection-hero"><img src="collection-header-privee.jpg" alt="Ma collection"></div>
+    <header class="page-head"><a class="ph-back" href="#/" aria-label="Accueil">‹</a><img class="ph-circle" src="img/circle-collection.jpg" alt=""><h1>Ma collection</h1><p>Tes capsules, au même endroit</p></header>
     <div class="content" id="collection-content"></div>
   </section>
 
@@ -96,7 +99,7 @@
   </section>
 
   <section id="screen-members" class="screen">
-    <header class="topbar"><a class="icon-btn" href="#/" aria-label="Accueil">‹</a><h2>Membres</h2><span class="icon-btn spacer"></span></header>
+    <header class="page-head"><a class="ph-back" href="#/" aria-label="Accueil">‹</a><img class="ph-circle" src="img/circle-membres.jpg" alt=""><h1>La communauté</h1><p>Échange avec les autres membres</p></header>
     <div class="content">
       <input id="member-q" class="search" type="search" placeholder="Rechercher un membre par pseudo…" autocomplete="off" autocapitalize="off" spellcheck="false">
       <div id="members-list"></div>
