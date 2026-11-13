@@ -272,7 +272,9 @@ function openMoods() {
     <h3 id="moods-title">Quelle est ton humeur ?</h3>
     <p class="sheet-sub">Choisis une envie, on te trouve les capsules qui vont avec !</p>
     <div class="moods">${tiles}</div>
-    <button class="btn secondary" data-action="mood-random">🎲 Surprends-moi complètement</button>
+    <button class="mood mood-surprise" data-action="mood-random" style="--d:${MOODS.length};--img:url(${new URL('img/mood-surprise.jpg', document.baseURI).href})">
+      <svg class="mood-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M8.5 8.5h.01M15.5 8.5h.01M12 12h.01M8.5 15.5h.01M15.5 15.5h.01" stroke-width="2.6"/></svg>
+      <span class="mood-txt"><b>Surprends-moi</b><small>Une humeur tirée au hasard, laisse-toi porter.</small></span></button>
   </div>`, 'bottom');
 }
 // En carrousel : une rangée par marque ; sinon la liste suit l'ordre de pertinence.
