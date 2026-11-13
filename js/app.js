@@ -3,6 +3,7 @@
 // à part la session de connexion gérée par Supabase et le choix d'affichage des listes.
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+import { ANECDOTES } from './anecdotes.js';
 import { identify } from './scan.js';
 
 const OAUTH_ENABLED = false; // connexions Google / Apple : à activer plus tard
@@ -335,39 +336,23 @@ const WELCOME = [
   'Le meilleur moment de la journée ? Celui de la capsule.', 'Bienvenue au comptoir Baristina, installe-toi.',
 ];
 const HOME_MSG = WELCOME[Math.floor(Math.random() * WELCOME.length)];
-let welcomed = false, welcomeTimer;
-function showWelcome() {
-  if (welcomed) return; welcomed = true;
-  const h = new Date().getHours();
-  const hello = h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour';
-  const name = S.profile?.username;
-  const w = $('welcome');
-  w.innerHTML = `<img src="apple-touch-icon.png" alt="" class="w-icon">
-    <div class="w-body"><div class="w-top"><span>BARISTINA</span><span>maintenant</span></div>
-    <b>${hello}${name ? ' ' + esc(name) : ''} ☕</b><p>${esc(WELCOME[Math.floor(Math.random() * WELCOME.length)])}</p></div>
-    <span class="w-bar" aria-hidden="true"></span>`;
-  w.hidden = false;
-  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('show')));
-  welcomeTimer = setTimeout(hideWelcome, 5500);
-}
-function hideWelcome() {
-  const w = $('welcome'); clearTimeout(welcomeTimer);
-  if (w.hidden || !w.classList.contains('show')) return;
-  w.classList.remove('show'); w.classList.add('hide');
-  setTimeout(() => { w.hidden = true; w.classList.remove('hide'); w.style.transform = ''; }, 450);
-}
-// Toucher pour fermer, ou glisser vers le haut comme une vraie notification.
-{
-  const w = $('welcome'); let y0 = null;
-  w.addEventListener('click', hideWelcome);
-  w.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; clearTimeout(welcomeTimer); }, { passive: true });
-  w.addEventListener('touchmove', (e) => { if (y0 == null) return; const d = Math.min(0, e.touches[0].clientY - y0); w.style.transform = `translate(-50%, ${d}px)`; }, { passive: true });
-  w.addEventListener('touchend', (e) => {
-    const d = (e.changedTouches[0]?.clientY ?? y0) - y0; y0 = null; w.style.transform = '';
-    if (d < -25) hideWelcome(); else welcomeTimer = setTimeout(hideWelcome, 2500);
-  });
-}
 
+// ---------------------------------------------------------------- anecdote du jour (accueil)
+// Une anecdote au hasard à chaque lancement ; toucher la carte en tire une autre (jamais la même).
+let factIdx = -1;
+function showFact(animate) {
+  let i; do { i = Math.floor(Math.random() * ANECDOTES.length); } while (i === factIdx && ANECDOTES.length > 1);
+  factIdx = i;
+  const card = $('trivia');
+  const fill = () => {
+    $('trivia-num').textContent = `n° ${i + 1}`;
+    // mot par mot, pour une apparition en cascade
+    $('trivia-text').innerHTML = ANECDOTES[i].split(' ').map((w, k) => `<span style="--k:${k}">${esc(w)}</span>`).join(' ');
+  };
+  if (!animate) { fill(); return; }
+  card.classList.remove('flip'); void card.offsetWidth; card.classList.add('flip');
+  setTimeout(fill, 260);
+}
 // ---------------------------------------------------------------- affichage des listes : 5 formes
 // Le choix est mémorisé sur l'appareil (simple préférence d'affichage, aucune donnée personnelle).
 const VIEWS = [
@@ -432,7 +417,8 @@ function render() {
   // Bulle de profil en haut à droite de l'accueil : ma photo (ou initiale), sinon une silhouette (connexion).
   // Message d'accueil : tiré au hasard une fois par lancement, avec le pseudo si connecté.
   const h = new Date().getHours(), name = S.profile?.username;
-  $('home-msg').textContent = `${h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour'}${name ? ' ' + name : ''} ! ${HOME_MSG}`;
+  $('hn-title').textContent = `${h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour'}${name ? ' ' + name : ''} ☕`;
+  $('hn-msg').textContent = HOME_MSG;
   ({ catalog: renderCatalog, detail: renderDetail, collection: renderCollection, account: renderAccount, members: renderMembers, profile: renderProfile, mood: renderMood })[S.screen]?.();
 }
 window.addEventListener('hashchange', route);
@@ -867,6 +853,7 @@ document.addEventListener('click', async (e) => {
     }
     case 'open-moods': openMoods(); break;
     case 'open-menu': openMenu(); break;
+    case 'next-fact': showFact(true); break;
     case 'mood-random': { const m = MOODS[Math.floor(Math.random() * MOODS.length)]; location.hash = '#/humeur/' + m.id; break; }
     case 'mood-surprise': {
       const m = MOODS.find((x) => x.id === MOOD.id); if (!m) break;
@@ -1026,14 +1013,14 @@ async function onSession(session) {
   if (uid === (S.user?.id ?? null) && S.profileLoaded) return;
   S.user = session?.user ?? null;
   await loadUserData(); S.profileLoaded = true;
-  setTimeout(showWelcome, 500);
   if (S.user && !S.profile?.username && S.screen !== 'account') location.hash = '#/compte'; // pseudo obligatoire
   if (location.hash.startsWith('#/compte')) route(); else render(); // « Compte » : profil ou connexion selon la session
   if (S.screen === 'scan' && $('photo-preview').hidden) resetScan();
 }
 async function start() {
+  showFact(false);
   route();
-  if (!CONFIGURED) { setTimeout(showWelcome, 700); return; }
+  if (!CONFIGURED) return;
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') { S.recovery = true; location.hash = '#/compte'; }
     setTimeout(() => onSession(session), 0); // ne pas appeler Supabase dans le rappel lui-même

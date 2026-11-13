@@ -21,13 +21,25 @@
       <img class="home-logo" src="img/logo-rect.png" alt="Baristina — scannez, découvrez, savourez">
       <button class="home-menu" data-action="open-menu" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></button>
     </header>
-    <p class="home-msg" id="home-msg"></p>
+    <div class="home-notif" role="status">
+      <span class="hn-icon"><img src="apple-touch-icon.png" alt=""></span>
+      <div class="hn-body"><div class="hn-top"><span>BARISTINA</span><span class="hn-dot" aria-hidden="true"></span><span>maintenant</span></div>
+        <b id="hn-title"></b><p id="hn-msg"></p></div>
+    </div>
     <div class="home-tiles">
       <a class="home-tile" href="#/scanner"><img src="img/home-scan.jpg" alt=""><span>Scannez une capsule</span></a>
       <button class="home-tile" data-action="open-moods"><img src="img/home-humeur.jpg" alt=""><span>Une envie ?</span></button>
       <a class="home-tile" href="#/collection"><img src="img/home-collection.jpg" alt=""><span>Collection privée</span></a>
       <a class="home-tile" href="#/catalogue"><img src="img/home-catalogue.jpg" alt=""><span>Catalogue</span></a>
     </div>
+    <button class="trivia" id="trivia" data-action="next-fact" aria-label="Anecdote sur le café, touche pour en voir une autre">
+      <span class="trivia-head">
+        <svg class="trivia-cup" viewBox="0 0 32 32" aria-hidden="true"><path class="steam s1" d="M11 11c-2-2.5 2-4 0-7"/><path class="steam s2" d="M16 11c-2-2.5 2-4 0-7"/><path class="steam s3" d="M21 11c-2-2.5 2-4 0-7"/><path d="M6 14h20v5a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z"/><path d="M26 16h1.5a3 3 0 0 1 0 6H25"/></svg>
+        <b>Le saviez-vous ?</b><span class="trivia-num" id="trivia-num"></span>
+      </span>
+      <p class="trivia-text" id="trivia-text"></p>
+      <span class="trivia-hint">Touche pour une autre anecdote ↻</span>
+    </button>
     <p class="disclaimer">Baristina est une application indépendante, sans lien avec Nestlé Nespresso SA ni avec les autres marques citées. Les noms de produits cités ne sont mentionnés qu’à titre d’information.</p>
   </section>
 
@@ -122,7 +134,6 @@
     <a href="#/scanner" data-nav="scan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Scanner</a>
     <a href="#/compte" data-nav="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Compte</a>
   </nav>
-  <div id="welcome" class="welcome" role="status" aria-live="polite" hidden></div>
   <div id="overlay" class="overlay" hidden></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </main>

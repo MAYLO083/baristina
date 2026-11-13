@@ -509,7 +509,6 @@ h1, h2, h3 { font-weight: 400; }
 .home-logo { flex: 1; min-width: 0; width: 100%; max-width: 300px; height: auto; }
 .home-menu { flex: none; width: 46px; height: 46px; margin-left: auto; border: 0; border-radius: 50%; background: none; color: var(--marron); display: flex; align-items: center; justify-content: center; }
 .home-menu svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: square; }
-.home-msg { margin: 22px 4px 26px; font-size: 16px; line-height: 1.4; color: var(--marron); }
 .home-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .home-tile { position: relative; display: block; aspect-ratio: 1; padding: 0; overflow: hidden; border: 0; border-radius: 22px; background: var(--sand); color: #fff; text-decoration: none; font: inherit;
   box-shadow: 0 10px 22px -16px #321f11; animation: rise-in .5s cubic-bezier(.2, 1, .3, 1) both; }
@@ -565,3 +564,43 @@ h1, h2, h3 { font-weight: 400; }
 /* page d'une humeur */
 .mood-hero h1 { font-family: var(--font); font-weight: 600; }
 .mood-hero p { font-family: var(--font); }
+
+
+/* ================================================================ accueil : notification fixe + anecdote (2026-11-13) */
+.home-notif { position: relative; display: flex; gap: 12px; align-items: center; margin: 18px 0 18px; padding: 12px 14px; overflow: hidden; border-radius: 20px;
+  background: #f1e0cee6; box-shadow: 0 10px 24px -14px #321f11a6, inset 0 0 0 1px #ffffff99; animation: notif-drop .8s .15s cubic-bezier(.18, 1.35, .35, 1) both; }
+.home-notif::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, #ffffffa6 50%, transparent 65%); transform: translateX(-110%);
+  animation: notif-shine 6s 1.4s ease-in-out infinite; pointer-events: none; }
+.hn-icon { flex: none; width: 44px; height: 44px; border-radius: 11px; overflow: hidden; box-shadow: 0 2px 6px #321f1133; animation: w-icon .9s .55s cubic-bezier(.2, 1.6, .4, 1) both; }
+.hn-icon img { width: 100%; height: 100%; }
+.hn-body { flex: 1; min-width: 0; }
+.hn-top { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; color: var(--sub); }
+.hn-top span:last-child { margin-left: auto; font-weight: 400; letter-spacing: 0; }
+.hn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--marron); animation: dot-pulse 2s 1.2s ease-in-out infinite; }
+.home-notif b { display: block; margin-top: 2px; font-size: 16px; font-weight: 600; color: var(--marron); animation: w-text .5s .5s cubic-bezier(.2, .9, .3, 1) both; }
+.home-notif p { margin: 1px 0 0; font-size: 14px; line-height: 1.35; color: var(--sub); animation: w-text .5s .62s cubic-bezier(.2, .9, .3, 1) both; }
+@keyframes notif-drop { from { opacity: 0; transform: translateY(-60px) scale(.94); } }
+@keyframes notif-shine { 0%, 70% { transform: translateX(-110%); } 100% { transform: translateX(110%); } }
+@keyframes dot-pulse { 0%, 100% { box-shadow: 0 0 0 0 #321f1166; } 50% { box-shadow: 0 0 0 5px #321f1100; } }
+
+.trivia { position: relative; display: block; width: 100%; margin: 18px 0 0; padding: 14px 16px 12px; overflow: hidden; border: 0; border-radius: 20px; text-align: left; color: #f1e0ce; font: inherit;
+  background: radial-gradient(circle at 100% 0%, #5b4434 0%, transparent 55%), var(--marron); box-shadow: 0 12px 26px -16px #321f11;
+  animation: rise-in .6s .35s cubic-bezier(.2, 1, .3, 1) both; transform-origin: center; }
+.trivia::before { content: ""; position: absolute; right: -30px; bottom: -40px; width: 130px; height: 130px; border-radius: 50%; border: 18px solid #f1e0ce0f; animation: spin-slow 18s linear infinite; }
+.trivia.flip { animation: trivia-flip .55s cubic-bezier(.4, 0, .2, 1); }
+.trivia-head { display: flex; align-items: center; gap: 8px; }
+.trivia-head b { font-size: 16px; font-weight: 600; color: #fff; }
+.trivia-num { margin-left: auto; padding: 2px 9px; border-radius: 99px; background: #f1e0ce26; font-size: 11px; }
+.trivia-cup { flex: none; width: 30px; height: 30px; fill: none; stroke: #f1e0ce; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.trivia-cup .steam { stroke-dasharray: 10; animation: steam 2.4s ease-in-out infinite; }
+.trivia-cup .s2 { animation-delay: .5s; } .trivia-cup .s3 { animation-delay: 1s; }
+.trivia-text { position: relative; margin: 8px 0 6px; font-size: 15px; line-height: 1.4; font-weight: 300; color: #fff; }
+.trivia-text span { display: inline-block; animation: word-in .45s calc(.6s + var(--k) * .035s) cubic-bezier(.2, .9, .3, 1) both; }
+.trivia.flip .trivia-text span { animation-delay: calc(.28s + var(--k) * .03s); }
+.trivia-hint { display: block; position: relative; font-size: 11px; color: #f1e0ceb3; }
+.trivia:active { transform: scale(.98); }
+@keyframes steam { 0% { opacity: 0; transform: translateY(3px); stroke-dashoffset: 10; } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-4px); stroke-dashoffset: 0; } }
+@keyframes word-in { from { opacity: 0; transform: translateY(8px); filter: blur(3px); } }
+@keyframes trivia-flip { 0% { transform: none; } 45% { transform: perspective(700px) rotateX(85deg); opacity: .4; } 55% { transform: perspective(700px) rotateX(-85deg); opacity: .4; } 100% { transform: none; } }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .home-notif, .home-notif::after, .hn-dot, .trivia, .trivia::before, .trivia-cup .steam, .trivia-text span { animation: none !important; } }
