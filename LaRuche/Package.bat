@@ -1,7 +1,7 @@
 @echo off
 rem Fabrique la version jouable du jeu dans le dossier Build\
 rem Modifiez la ligne ci-dessous si Unreal est installe ailleurs ou dans une autre version.
-set UE=C:\Program Files\Epic Games\UE_5.6
+set UE=C:\Program Files\Epic Games\UE_5.8
 
 if not exist "%UE%\Engine\Build\BatchFiles\RunUAT.bat" (
 	echo Unreal Engine introuvable dans "%UE%".
