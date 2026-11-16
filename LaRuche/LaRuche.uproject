@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "",
+	"Category": "",
+	"Description": "La Ruche - extraction shooter PvE coop",
+	"Modules": [
+		{
+			"Name": "LaRuche",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
