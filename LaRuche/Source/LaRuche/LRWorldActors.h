@@ -6,6 +6,7 @@
 #include "LRWorldActors.generated.h"
 
 class UStaticMesh;
+class UMaterialInterface;
 class UStaticMeshComponent;
 class UPointLightComponent;
 class UDirectionalLightComponent;
@@ -21,8 +22,14 @@ namespace LR
 	UStaticMesh* Cylinder();
 	UStaticMesh* Cone();
 
-	/** Colore un mesh de forme basique. */
-	void Tint(UStaticMeshComponent* Comp, const FLinearColor& Color);
+	/**
+	 * Materiau colorable du jeu. Dans l'editeur il est cree et enregistre automatiquement
+	 * (Content/LaRuche/M_LRColor) s'il n'existe pas encore.
+	 */
+	UMaterialInterface* ColorMaterial();
+
+	/** Colore un mesh. Glow > 0 le rend lumineux. */
+	void Tint(UStaticMeshComponent* Comp, const FLinearColor& Color, float Glow = 0.f);
 
 	/** Cree une piece visuelle sans collision (a appeler dans un constructeur). */
 	UStaticMeshComponent* Part(AActor* Owner, FName Name, USceneComponent* Parent, UStaticMesh* Mesh, const FVector& Loc, const FVector& Scale);

@@ -20,7 +20,7 @@ namespace
 {
 	const float FontMul = 1.5f;
 	const FLinearColor ColText(0.9f, 0.92f, 0.88f);
-	const FLinearColor ColDim(0.55f, 0.58f, 0.55f);
+	const FLinearColor ColDim(0.72f, 0.75f, 0.72f);
 	const FLinearColor ColGreen(0.35f, 0.95f, 0.45f);
 	const FLinearColor ColRed(1.f, 0.3f, 0.25f);
 	const FLinearColor ColYellow(1.f, 0.85f, 0.3f);
@@ -30,7 +30,10 @@ namespace
 
 void ALRHUD::Txt(const FString& Text, float X, float Y, const FLinearColor& Color, float Scale)
 {
-	DrawText(Text, Color, X, Y, nullptr, Scale * S * FontMul, false);
+	const float Size = Scale * S * FontMul;
+	const float Off = FMath::Max(1.f, 1.5f * S);
+	DrawText(Text, FLinearColor(0.f, 0.f, 0.f, 0.9f), X + Off, Y + Off, nullptr, Size, false);
+	DrawText(Text, Color, X, Y, nullptr, Size, false);
 }
 
 float ALRHUD::TxtW(const FString& Text, float Scale) const
@@ -191,8 +194,9 @@ void ALRHUD::DrawHUD()
 	{
 		return;
 	}
-	S = Canvas->ClipY / 1080.f;
-	OX = (Canvas->ClipX - 1920.f * S) * 0.5f;
+	// L'interface est dessinee pour du 1920x1080 puis reduite pour tenir dans la fenetre.
+	S = FMath::Min(Canvas->ClipX / 1920.f, Canvas->ClipY / 1080.f);
+	OX = FMath::Max(0.f, (Canvas->ClipX - 1920.f * S) * 0.5f);
 	Mouse = FVector2D(-1.f, -1.f);
 	PC->GetMouse(Mouse);
 	GS = GetWorld()->GetGameState<ALRGameState>();

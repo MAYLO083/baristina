@@ -14,6 +14,16 @@
 #include "GameFramework/GameStateBase.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Net/UnrealNetwork.h"
+#include "Misc/PackageName.h"
+
+#if WITH_EDITOR
+#include "Materials/Material.h"
+#include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
+#include "UObject/Package.h"
+#include "UObject/SavePackage.h"
+#endif
 
 namespace
 {
@@ -56,20 +66,76 @@ UStaticMesh* LR::Cone()
 	return LoadShape(Cache, TEXT("/Engine/BasicShapes/Cone.Cone"));
 }
 
-void LR::Tint(UStaticMeshComponent* Comp, const FLinearColor& Color)
+UMaterialInterface* LR::ColorMaterial()
+{
+	static TWeakObjectPtr<UMaterialInterface> Cache;
+	if (Cache.IsValid())
+	{
+		return Cache.Get();
+	}
+	const FString PackageName = TEXT("/Game/LaRuche/M_LRColor");
+	UMaterialInterface* Result = nullptr;
+	if (FPackageName::DoesPackageExist(PackageName))
+	{
+		Result = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LaRuche/M_LRColor.M_LRColor"));
+	}
+
+#if WITH_EDITOR
+	if (!Result)
+	{
+		// Premier lancement dans l'editeur : on fabrique le materiau (couleur + lueur) et on l'enregistre,
+		// pour qu'il soit aussi present dans le jeu empaquete.
+		UPackage* Package = CreatePackage(*PackageName);
+		UMaterial* NewMat = NewObject<UMaterial>(Package, TEXT("M_LRColor"), RF_Public | RF_Standalone);
+
+		UMaterialExpressionVectorParameter* ColorParam = NewObject<UMaterialExpressionVectorParameter>(NewMat);
+		ColorParam->ParameterName = TEXT("Color");
+		ColorParam->DefaultValue = FLinearColor(0.5f, 0.5f, 0.5f);
+
+		UMaterialExpressionScalarParameter* GlowParam = NewObject<UMaterialExpressionScalarParameter>(NewMat);
+		GlowParam->ParameterName = TEXT("Glow");
+		GlowParam->DefaultValue = 0.f;
+
+		UMaterialExpressionMultiply* Mul = NewObject<UMaterialExpressionMultiply>(NewMat);
+		Mul->A.Expression = ColorParam;
+		Mul->B.Expression = GlowParam;
+
+		NewMat->GetExpressionCollection().AddExpression(ColorParam);
+		NewMat->GetExpressionCollection().AddExpression(GlowParam);
+		NewMat->GetExpressionCollection().AddExpression(Mul);
+		NewMat->GetEditorOnlyData()->BaseColor.Expression = ColorParam;
+		NewMat->GetEditorOnlyData()->EmissiveColor.Expression = Mul;
+		NewMat->PostEditChange();
+
+		Package->MarkPackageDirty();
+		FSavePackageArgs SaveArgs;
+		SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		const FString FileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
+		UPackage::SavePackage(Package, NewMat, *FileName, SaveArgs);
+		Result = NewMat;
+	}
+#endif
+
+	Cache = Result;
+	return Result;
+}
+
+void LR::Tint(UStaticMeshComponent* Comp, const FLinearColor& Color, float Glow)
 {
 	if (!Comp)
 	{
 		return;
 	}
+	UMaterialInterface* Base = ColorMaterial();
 	UMaterialInstanceDynamic* Mat = Cast<UMaterialInstanceDynamic>(Comp->GetMaterial(0));
-	if (!Mat)
+	if (!Mat || (Base && Mat->Parent != Base))
 	{
-		Mat = Comp->CreateAndSetMaterialInstanceDynamic(0);
+		Mat = Base ? Comp->CreateDynamicMaterialInstance(0, Base) : Comp->CreateAndSetMaterialInstanceDynamic(0);
 	}
 	if (Mat)
 	{
 		Mat->SetVectorParameterValue(TEXT("Color"), Color);
+		Mat->SetScalarParameterValue(TEXT("Glow"), Glow);
 	}
 }
 
@@ -118,7 +184,7 @@ ALREnvironment::ALREnvironment()
 	Sun = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Sun"));
 	Sun->SetupAttachment(Root);
 	Sun->SetMobility(EComponentMobility::Movable);
-	Sun->SetRelativeRotation(FRotator(-32.f, 40.f, 0.f));
+	Sun->SetRelativeRotation(FRotator(-22.f, 40.f, 0.f));
 
 	Sky = CreateDefaultSubobject<USkyLightComponent>(TEXT("Sky"));
 	Sky->SetupAttachment(Root);
@@ -155,13 +221,13 @@ void ALREnvironment::SetTier(int32 Tier)
 	};
 	if (Fog)
 	{
-		Fog->SetFogDensity(0.02f + 0.006f * Tier);
+		Fog->SetFogDensity(0.045f + 0.012f * Tier);
 		Fog->SetFogInscatteringColor(FogColors[Tier - 1]);
 	}
 	if (Sun)
 	{
 		Sun->SetLightColor(SunColors[Tier - 1]);
-		Sun->SetIntensity(4.f);
+		Sun->SetIntensity(2.5f);
 	}
 	if (Sky)
 	{
@@ -213,7 +279,7 @@ void ALRFx::Tracer(UWorld* World, const FVector& A, const FVector& B, const FLin
 		return;
 	}
 	Fx->Mesh->SetWorldScale3D(FVector(Len / 100.f, 0.025f, 0.025f));
-	LR::Tint(Fx->Mesh, Color);
+	LR::Tint(Fx->Mesh, Color, 30.f);
 	Fx->Light->SetWorldLocation(A);
 	Fx->Light->SetLightColor(Color);
 	Fx->Light->SetIntensity(6000.f);
@@ -238,7 +304,7 @@ void ALRFx::Burst(UWorld* World, const FVector& Loc, float Radius, const FLinear
 	Fx->Mesh->SetStaticMesh(LR::Sphere());
 	Fx->Mesh->SetWorldScale3D(FVector(Final * 0.25f));
 	Fx->Grow = Final * 0.75f / Life;
-	LR::Tint(Fx->Mesh, Color);
+	LR::Tint(Fx->Mesh, Color, 8.f);
 	Fx->Light->SetLightColor(Color);
 	Fx->Light->SetIntensity(12000.f);
 	Fx->Light->SetAttenuationRadius(FMath::Max(700.f, Radius * 2.f));
@@ -281,7 +347,7 @@ void ALRPickup::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 void ALRPickup::OnRep_Stack()
 {
 	const FLRItemDef* Def = FLRItems::Find(Stack.Id);
-	LR::Tint(Mesh, FLRItems::RarityColor(Def ? Def->Rarity : 0));
+	LR::Tint(Mesh, FLRItems::RarityColor(Def ? Def->Rarity : 0), 2.f);
 }
 
 FString ALRPickup::GetPrompt(const ALRCharacter* By) const
@@ -439,7 +505,7 @@ void ALRExtraction::OnRep_Visual()
 
 void ALRExtraction::ApplyVisual()
 {
-	LR::Tint(Mesh, bOpen ? FLinearColor(0.1f, 0.9f, 0.3f) : FLinearColor(0.3f, 0.03f, 0.03f));
+	LR::Tint(Mesh, bOpen ? FLinearColor(0.1f, 0.9f, 0.3f) : FLinearColor(0.3f, 0.03f, 0.03f), bOpen ? 3.f : 0.f);
 }
 
 int32 ALRExtraction::HeliState() const
@@ -569,7 +635,7 @@ ALRBeacon::ALRBeacon()
 void ALRBeacon::BeginPlay()
 {
 	Super::BeginPlay();
-	LR::Tint(Mesh, FLinearColor(0.1f, 0.9f, 1.f));
+	LR::Tint(Mesh, FLinearColor(0.1f, 0.9f, 1.f), 4.f);
 }
 
 void ALRBeacon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -671,7 +737,7 @@ void ALRSensorSite::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void ALRSensorSite::OnRep_Done()
 {
-	LR::Tint(Mesh, bDone ? FLinearColor(0.1f, 0.8f, 0.2f) : FLinearColor(0.15f, 0.4f, 1.f));
+	LR::Tint(Mesh, bDone ? FLinearColor(0.1f, 0.8f, 0.2f) : FLinearColor(0.15f, 0.4f, 1.f), 3.f);
 }
 
 void ALRSensorSite::OnInteract(ALRCharacter* By)
